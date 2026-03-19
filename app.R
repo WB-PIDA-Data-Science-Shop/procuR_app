@@ -339,7 +339,7 @@ econ_filter_data <- function(df, year_range = NULL, market = NULL, value_range =
   if (!is.null(year_range) && "tender_year" %in% names(df))
     filtered <- filtered %>% filter(tender_year >= year_range[1] & tender_year <= year_range[2])
   
-  if (!is.null(market) && length(market) > 0 && "All" %ni% market && "cpv_cluster" %in% names(df))
+  if (!is.null(market) && length(market) > 0 && "cpv_cluster" %in% names(df))
     filtered <- filtered %>% filter(cpv_cluster %in% market)
   
   if (!is.null(value_range) && !is.null(value_divisor)) {
@@ -358,7 +358,7 @@ econ_filter_data <- function(df, year_range = NULL, market = NULL, value_range =
     }
   }
   
-  if (!is.null(buyer_type) && length(buyer_type) > 0 && "All" %ni% buyer_type &&
+  if (!is.null(buyer_type) && length(buyer_type) > 0 &&
       "buyer_buyertype" %in% names(df)) {
     if (!is.null(buyer_mapping)) {
       raw_values <- buyer_mapping[buyer_mapping$group %in% buyer_type, "raw"]
@@ -368,7 +368,7 @@ econ_filter_data <- function(df, year_range = NULL, market = NULL, value_range =
     }
   }
   
-  if (!is.null(procedure_type) && length(procedure_type) > 0 && "All" %ni% procedure_type &&
+  if (!is.null(procedure_type) && length(procedure_type) > 0 &&
       "tender_proceduretype" %in% names(df)) {
     if (!is.null(procedure_mapping)) {
       raw_values <- procedure_mapping[procedure_mapping$cleaned %in% procedure_type, "raw"]
@@ -404,7 +404,7 @@ admin_filter_data <- function(df, year_range = NULL, market = NULL, value_range 
         filter(.data[[year_col]] >= year_range[1] & .data[[year_col]] <= year_range[2])
   }
   
-  if (!is.null(market) && length(market) > 0 && "All" %ni% market && "lot_productcode" %in% names(df))
+  if (!is.null(market) && length(market) > 0 && "lot_productcode" %in% names(df))
     filtered_df <- filtered_df %>%
       mutate(cpv_2dig = substr(lot_productcode, 1, 2)) %>%
       filter(cpv_2dig %in% market) %>%
@@ -422,14 +422,14 @@ admin_filter_data <- function(df, year_range = NULL, market = NULL, value_range 
     }
   }
   
-  if (!is.null(buyer_type) && length(buyer_type) > 0 && "All" %ni% buyer_type &&
+  if (!is.null(buyer_type) && length(buyer_type) > 0 &&
       "buyer_buyertype" %in% names(df))
     filtered_df <- filtered_df %>%
       mutate(buyer_group = add_buyer_group(buyer_buyertype)) %>%
       filter(as.character(buyer_group) %in% buyer_type) %>%
       select(-buyer_group)
   
-  if (!is.null(procedure_type) && length(procedure_type) > 0 && "All" %ni% procedure_type &&
+  if (!is.null(procedure_type) && length(procedure_type) > 0 &&
       "tender_proceduretype" %in% names(df)) {
     if (!is.null(procedure_mapping)) {
       raw_values <- procedure_mapping[procedure_mapping$cleaned %in% procedure_type, "raw"]
@@ -459,7 +459,7 @@ integrity_filter_data <- function(df, year_range = NULL, market = NULL, value_ra
       filtered_df <- filtered_df %>%
         dplyr::filter(.data[[year_col]] >= year_range[1] & .data[[year_col]] <= year_range[2])
   }
-  if (!is.null(market) && length(market) > 0 && "All" %ni% market && "lot_productcode" %in% names(df))
+  if (!is.null(market) && length(market) > 0 && "lot_productcode" %in% names(df))
     filtered_df <- filtered_df %>%
       dplyr::mutate(cpv_2dig = substr(lot_productcode, 1, 2)) %>%
       dplyr::filter(cpv_2dig %in% market) %>%
@@ -474,13 +474,13 @@ integrity_filter_data <- function(df, year_range = NULL, market = NULL, value_ra
                         .data[[price_col]] <= value_range[2] * value_divisor)
     }
   }
-  if (!is.null(buyer_type) && length(buyer_type) > 0 && "All" %ni% buyer_type &&
+  if (!is.null(buyer_type) && length(buyer_type) > 0 &&
       "buyer_buyertype" %in% names(df))
     filtered_df <- filtered_df %>%
       dplyr::mutate(buyer_group = add_buyer_group(buyer_buyertype)) %>%
       dplyr::filter(as.character(buyer_group) %in% buyer_type) %>%
       dplyr::select(-buyer_group)
-  if (!is.null(procedure_type) && length(procedure_type) > 0 && "All" %ni% procedure_type &&
+  if (!is.null(procedure_type) && length(procedure_type) > 0 &&
       "tender_proceduretype" %in% names(df))
     filtered_df <- filtered_df %>%
       dplyr::filter(recode_procedure_type(tender_proceduretype) %in% procedure_type)
@@ -1713,7 +1713,26 @@ h1,h2,h3,h4,h5,h6{font-family:var(--font-main);font-weight:600;color:var(--navy)
 .main-header .navbar,.main-header .logo{background-color:var(--navy-mid)!important;border-bottom:none!important;}
 .main-header .logo{width:260px!important;display:flex!important;align-items:center!important;padding:0 16px!important;}
 .main-header .navbar{margin-left:260px!important;}
-.sidebar-toggle{height:50px!important;padding:15px 18px!important;}
+/* ── Sidebar collapse (hamburger toggle) ── */
+body.sidebar-collapse .main-header .navbar{margin-left:0!important;}
+body.sidebar-collapse .content-wrapper,
+body.sidebar-collapse .right-side,
+body.sidebar-collapse .main-footer{margin-left:0!important;}
+body.sidebar-collapse .main-sidebar{
+  -webkit-transform:translate(-260px,0);
+  transform:translate(-260px,0);
+  width:260px!important;
+}
+body.sidebar-collapse .main-sidebar:hover{
+  -webkit-transform:translate(0,0);
+  transform:translate(0,0);
+}
+/* smooth transition */
+.main-sidebar,.content-wrapper,.right-side,.main-footer,.main-header .navbar{
+  transition:margin-left .25s ease, transform .25s ease, width .25s ease;
+}
+.sidebar-toggle{height:50px!important;padding:15px 18px!important;position:absolute!important;left:0!important;top:0!important;z-index:1050!important;}
+.main-header .logo{padding-left:50px!important;}
 /* ── App title in header ── */
 .app-logo{display:flex;align-items:baseline;gap:5px;line-height:1;}
 .app-logo-name{font-family:var(--font-main)!important;font-weight:800!important;font-size:20px!important;letter-spacing:-0.5px!important;color:#ffffff!important;}
@@ -1940,24 +1959,28 @@ ui <- dashboardPage(
       tags$li(class = "section-header", "Economic Outcomes"),
       menuItem("Market Sizing",     tabName = "market_sizing",     icon = icon("chart-bar")),
       menuItem("Supplier Dynamics", tabName = "supplier_dynamics", icon = icon("users")),
-      menuItem("Networks",          tabName = "networks",          icon = icon("project-diagram")),
+      menuItem(tags$span("Networks", tags$span("★", style = "margin-left:6px; color:#f0c040; font-size:10px; vertical-align:middle;")),
+               tabName = "networks", icon = icon("project-diagram")),
       menuItem("Relative Prices",   tabName = "relative_prices",   icon = icon("dollar-sign")),
       menuItem("Competition",       tabName = "competition",       icon = icon("trophy")),
       
       # ── Administrative Efficiency ────────────────────────────────────
       tags$li(class = "section-header", "Administrative Efficiency"),
-      menuItem("Configuration",      tabName = "configuration",  icon = icon("sliders")),
       menuItem("Procedure Types",    tabName = "procedures",     icon = icon("list-check")),
       menuItem("Submission Periods", tabName = "submission",     icon = icon("clock")),
       menuItem("Decision Periods",   tabName = "decision",       icon = icon("gavel")),
-      menuItem("Regression Analysis",tabName = "regression",     icon = icon("chart-line")),
+      menuItem(tags$span("Regression Analysis", tags$span("★", style = "margin-left:6px; color:#f0c040; font-size:10px; vertical-align:middle;")),
+               tabName = "regression", icon = icon("chart-line")),
       
       # ── Procurement Integrity ────────────────────────────────────────
       tags$li(class = "section-header", "Procurement Integrity"),
-      menuItem("Missing Values",       tabName = "integrity_missing",     icon = icon("exclamation-triangle")),
-      menuItem("Interoperability",     tabName = "integrity_interop",     icon = icon("link")),
-      menuItem("Risky Profiles",       tabName = "integrity_risky",       icon = icon("exclamation-circle")),
-      menuItem("Prices & Competition", tabName = "integrity_prices",      icon = icon("dollar-sign")),
+      menuItem(tags$span("Missing Values", tags$span("★", style = "margin-left:6px; color:#f0c040; font-size:10px; vertical-align:middle;")),
+               tabName = "integrity_missing", icon = icon("exclamation-triangle")),
+      menuItem("Interoperability",   tabName = "integrity_interop", icon = icon("link")),
+      menuItem(tags$span("Risky Profiles", tags$span("★", style = "margin-left:6px; color:#f0c040; font-size:10px; vertical-align:middle;")),
+               tabName = "integrity_risky", icon = icon("exclamation-circle")),
+      menuItem(tags$span("Regression", tags$span("★", style = "margin-left:6px; color:#f0c040; font-size:10px; vertical-align:middle;")),
+               tabName = "integrity_prices", icon = icon("chart-line")),
       
       # ── Export ───────────────────────────────────────────────────────
       tags$li(class = "export-sep-li"),
@@ -1984,37 +2007,26 @@ ui <- dashboardPage(
                         tags$a(href = "https://www.procurementintegrity.org/data",
                                target = "_blank", "ProAct",
                                style = "color:#009FDA; font-weight:bold;"),
-                        " then click Run Analysis. Both the Economic Outcomes and",
-                        " Administrative Efficiency sections will be populated."
+                        " then click Run Analysis. All three analysis sections —",
+                        " Economic Outcomes, Administrative Efficiency, and Procurement Integrity — will be populated."
                     ),
                     fluidRow(
                       column(6,
                              fileInput("datafile", label = tags$div(icon("file-csv"), tags$strong(" Choose CSV File")),
                                        accept = c("text/csv",".csv"), buttonLabel = "Browse..."),
                              textInput("country_code", "Country Code (2 letters — blank = auto-detect)", value = "",
-                                       placeholder = "Auto-detecting from data…"),
-                             hr(),
-                             h4(icon("cog"), " Analysis Options"),
-                             checkboxInput("skip_regressions",
-                                           label = tags$span(icon("fast-forward"),
-                                                             " Skip regression analysis (recommended — run on demand from the Regression tab)"),
-                                           value = TRUE),
-                             helpText(icon("info-circle"),
-                                      " Regressions test whether short submission or long decision periods are linked to single-bidding.",
-                                      " Skipped by default for speed. Run on demand from the Regression Analysis tab after upload."),
-                             helpText(icon("project-diagram"),
-                                      " Networks can be generated on-demand from the Networks tab after analysis completes.")
+                                       placeholder = "Auto-detecting from data…")
                       ),
                       column(6,
                              h4("Instructions:"),
                              tags$ol(
-                               tags$li("Upload your procurement CSV file"),
-                               tags$li("Enter the two-letter country code"),
-                               tags$li("Configure analysis options as needed"),
-                               tags$li("Click 'Run Analysis' — both pipelines run automatically"),
-                               tags$li("Use Configuration tab to set admin thresholds"),
-                               tags$li("Navigate tabs to explore results"),
-                               tags$li("Use Export tab to download reports")
+                               tags$li("Upload your procurement CSV file from ", tags$a(href="https://www.procurementintegrity.org/data", target="_blank", "ProAct", style="color:#009FDA;font-weight:bold;")),
+                               tags$li("Enter the two-letter country code (or leave blank for auto-detection)"),
+                               tags$li("Click 'Run Analysis' — all three pipelines run automatically"),
+                               tags$li("Use the Procedure Types tab to set value thresholds and filter procedure types"),
+                               tags$li("Navigate the tabs to explore results"),
+                               tags$li("Run Network or Regression analyses on demand from their respective tabs"),
+                               tags$li("Use the Export tab to download reports and figures")
                              )
                       )
                     ),
@@ -2043,16 +2055,16 @@ ui <- dashboardPage(
                       tags$li("Contract value bunching analysis"),
                       tags$li("Submission period diagnostics"),
                       tags$li("Decision period diagnostics"),
-                      tags$li("Regression: admin efficiency → competition")
+                      tags$li("Regression: admin efficiency → competition (on demand)")
                     ),
                     hr(),
                     h5(icon("shield-alt"), " Procurement Integrity"),
                     tags$ul(
                       tags$li("Data quality & missing value patterns"),
                       tags$li("Interoperability of buyer/supplier IDs"),
-                      tags$li("Risky supplier profiles & market entry"),
-                      tags$li("Buyer-supplier concentration"),
-                      tags$li("Transparency impact on prices & competition")
+                      tags$li("Supplier concentration & unusual market entry"),
+                      tags$li("Market flow matrix & supplier network graphs (on demand)"),
+                      tags$li("Regression: transparency impact on prices & competition (on demand)")
                     )
                 )
               )
@@ -2065,35 +2077,36 @@ ui <- dashboardPage(
               h2("Analysis Overview"),
               fluidRow(
                 box(title = "Economic Outcomes", width = 4, status = "primary", solidHeader = TRUE,
-                    p("Analyzes market structure, supplier dynamics, buyer-supplier networks,",
-                      "pricing patterns, and competition levels across CPV procurement markets."),
+                    p("Analyses market structure, supplier dynamics, pricing patterns, and competition",
+                      " levels across CPV procurement markets."),
                     tags$ul(
-                      tags$li(tags$b("Market Sizing:"), " Distribution of contracts and values"),
-                      tags$li(tags$b("Supplier Dynamics:"), " New vs repeat suppliers"),
-                      tags$li(tags$b("Networks:"), " Buyer-supplier relationship structures"),
-                      tags$li(tags$b("Relative Prices:"), " Contract prices vs estimates"),
-                      tags$li(tags$b("Competition:"), " Single-bid incidence analysis")
+                      tags$li(tags$b("Data Overview:"), " How many contracts, buyers, and suppliers are in the data? Which years are covered and where are the gaps?"),
+                      tags$li(tags$b("Market Sizing:"), " Which CPV sectors account for the most contracts and the highest spend? Are a few markets driving most of the volume?"),
+                      tags$li(tags$b("Supplier Dynamics:"), " How many new suppliers enter each market each year? Are markets dominated by repeat winners or genuinely open to newcomers?"),
+                      tags$li(tags$b("Buyer–Supplier Networks:"), " Which buyers and suppliers are most interconnected? Are there tight clusters that may indicate restricted competition?"),
+                      tags$li(tags$b("Relative Prices:"), " Are contracts regularly awarded above estimated prices? Which buyers and markets overspend most?"),
+                      tags$li(tags$b("Competition:"), " What share of contracts attract only a single bid? Does this vary by procedure type, buyer type, or market?")
                     )
                 ),
                 box(title = "Administrative Efficiency", width = 4, status = "warning", solidHeader = TRUE,
-                    p("Examines administrative barriers in procurement, focusing on procedural",
-                      "compliance, timing efficiency, and their link to competitive outcomes."),
+                    p("Examines procedural compliance, timing efficiency, and their link to competitive outcomes."),
                     tags$ul(
-                      tags$li(tags$b("Procedure Mix:"), " Overuse of certain procedure types?"),
-                      tags$li(tags$b("Submission Periods:"), " Are bid deadlines too short?"),
-                      tags$li(tags$b("Decision Periods:"), " Are award decisions too slow?"),
-                      tags$li(tags$b("Competition Impact:"), " Does admin efficiency affect bids?")
+                      tags$li(tags$b("Procedure Mix:"), " Are open procedures used as often as expected? Is there over-reliance on negotiated or direct-award procedures?"),
+                      tags$li(tags$b("Contract Value Bunching:"), " Do contract values cluster suspiciously just below procurement thresholds, suggesting strategic splitting?"),
+                      tags$li(tags$b("Submission Periods:"), " How many tender calls give bidders less than the legal minimum to prepare? Which procedure types and buyers issue the shortest deadlines?"),
+                      tags$li(tags$b("Decision Periods:"), " How long does it take to award a contract after the bid deadline? Are excessively long decisions linked to lower competition?"),
+                      tags$li(tags$b("Regression Analysis"), " (on demand): Do short submission windows or slow decisions statistically predict single-bidding, controlling for market and year?")
                     )
                 ),
                 box(title = "Procurement Integrity", width = 4, status = "primary", solidHeader = TRUE,
-                    p("Assesses transparency and accountability in procurement systems,",
-                      "examining data quality, interoperability, and corruption risk indicators."),
+                    p("Assesses transparency and accountability, examining data quality, interoperability, and corruption risk indicators."),
                     tags$ul(
-                      tags$li(tags$b("Data Quality:"), " Patterns of underreporting in the data"),
-                      tags$li(tags$b("Interoperability:"), " Can data be matched to other registers?"),
-                      tags$li(tags$b("Risky Profiles:"), " Suppliers with unusual market activity"),
-                      tags$li(tags$b("Concentration:"), " Suspicious buyer-supplier connections"),
-                      tags$li(tags$b("Price Impact:"), " Transparency effect on prices & bids")
+                      tags$li(tags$b("Data Quality:"), " Which fields are most often missing? Are reporting gaps concentrated in particular buyers, years, or procedure types?"),
+                      tags$li(tags$b("Interoperability:"), " Can buyer and supplier records be matched to external registers? What share of organisations lack standard IDs?"),
+                      tags$li(tags$b("Supplier Profiles & Market Entry:"), " Which suppliers bid unusually far outside their home market? Which markets attract the most atypical entrants?"),
+                      tags$li(tags$b("Buyer–Supplier Concentration:"), " Which buyers award contracts to a narrow set of suppliers year after year? How has concentration evolved over time?"),
+                      tags$li(tags$b("Network Analysis"), " (on demand): How do cross-market bidding flows look as a heatmap matrix and as a supplier network graph?"),
+                      tags$li(tags$b("Regression Analysis"), " (on demand): Does missing data or lack of transparency predict higher single-bidding rates or elevated contract prices?")
                     )
                 )
               )
@@ -2121,19 +2134,22 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 box(title = "Total Contract Number per Year", width = 6, solidHeader = TRUE, status = "primary",
-                    style = "height:480px;",
-                    plotlyOutput("contracts_year_plot", height = "400px"),
+                    div(class = "description-box",
+                        p("Count of procurement contracts awarded each year in the filtered dataset.",
+                          " Use this chart to spot sudden drops or spikes — these often indicate data collection gaps,",
+                          " changes in reporting obligations, or exceptional procurement events.",
+                          " Years with very few contracts should be treated with caution in downstream analyses.")),
+                    plotlyOutput("contracts_year_plot", height = "380px"),
                     downloadButton("dl_contracts_year_econ", "Download Figure", class = "download-btn btn-sm")),
                 box(title = "Total Contract Value by Year", width = 6, solidHeader = TRUE, status = "primary",
-                    style = "height:480px;",
-                    plotlyOutput("value_by_year_plot", height = "400px"),
+                    div(class = "description-box",
+                        p("Sum of all contract values (USD) awarded each year.",
+                          " A year with high contract count but low total value may reflect fragmentation into small contracts.",
+                          " A year with low count but high value may reflect a small number of large framework awards.",
+                          " Use alongside the contract count chart to understand spending concentration.")),
+                    plotlyOutput("value_by_year_plot", height = "380px"),
                     downloadButton("dl_value_by_year", "Download Figure", class = "download-btn btn-sm"))
               ),
-              fluidRow(
-                box(title = "CPV Market Definitions", width = 12, solidHeader = TRUE, status = "primary",
-                    DT::dataTableOutput("cpv_legend_table"))
-              ),
-              
       ),
       
       # ==================================================================
@@ -2145,19 +2161,40 @@ ui <- dashboardPage(
                            filter_bar_ui("econ", "market"))),
               div(class = "question-header", "What is the overall market composition?"),
               div(class = "description-box",
-                  p("Market sizing examines how procurement spending is distributed across CPV markets.")),
+                  p("Market sizing examines how procurement spending is distributed across CPV markets.",
+                    " CPV (Common Procurement Vocabulary) codes group contracts by product or service category.",
+                    " The two-digit cluster used here groups related categories together for readability.")),
               fluidRow(
                 box(title = "Market Size by Number of Contracts", width = 12, solidHeader = TRUE, status = "primary",
+                    div(class = "description-box",
+                        p("Each bar is one CPV market, ranked by the total number of contracts awarded.",
+                          " This shows where procurement activity is most frequent,",
+                          " regardless of the monetary value of individual contracts.",
+                          " Markets with very high contract counts but low total values (see chart below)",
+                          " tend to consist of many small purchases.")),
                     plotlyOutput("market_size_n_plot", height = "450px"),
                     downloadButton("dl_market_size_n", "Download Figure", class = "download-btn btn-sm"))
               ),
               fluidRow(
                 box(title = "Market Size by Total Value", width = 12, solidHeader = TRUE, status = "primary",
+                    div(class = "description-box",
+                        p("Each bar is one CPV market, ranked by the total value (USD) of contracts awarded.",
+                          " This shows where the bulk of procurement spending is concentrated.",
+                          " Compare with the contract count chart: markets ranking high here but low there",
+                          " are dominated by a few large contracts.")),
                     plotlyOutput("market_size_v_plot", height = "450px"),
                     downloadButton("dl_market_size_v", "Download Figure", class = "download-btn btn-sm"))
               ),
               fluidRow(
                 box(title = "Market Size Bubble Plot", width = 12, solidHeader = TRUE, status = "primary",
+                    div(class = "description-box",
+                        p("Each bubble represents one CPV market.",
+                          strong(" X-axis"), " (log scale): number of contracts — further right means more activity.",
+                          strong(" Y-axis"), " (log scale): average contract value (USD) — higher means larger individual contracts.",
+                          strong(" Bubble size"), ": total market value (sum of all contracts).",
+                          " Markets in the top-right have both high volume and high average value.",
+                          " Markets in the bottom-left are small, low-value niches.",
+                          " Hover over any bubble to see the full market name.")),
                     plotlyOutput("market_size_av_plot", height = "500px"),
                     downloadButton("dl_market_size_av", "Download Figure", class = "download-btn btn-sm"))
               )
@@ -2357,26 +2394,42 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 box(title = "Trend Over Time", width = 12, solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Violin shape shows the full distribution each year.",
-                                                     " The dot marks the annual median, colour-coded: teal = under budget, amber = slightly over, red = over.",
-                                                     " Grey band = \u00b120% of estimate.")),
+                    div(class = "description-box",
+                        p("Each dot is the percentage of contracts that exceeded their estimated price in that year.",
+                          " The grey ribbon is the ", strong("95% confidence interval"), " on that proportion.",
+                          " The dashed horizontal line marks the overall average across all years.",
+                          " Dots coloured ", strong("red"), " sit above the overall average; ",
+                          strong("teal"), " dots sit below.",
+                          " Hover for exact values and confidence bounds.")),
                     plotlyOutput("rel_year_plot", height = "350px"),
                     downloadButton("dl_rel_year", "Download Figure", class = "download-btn btn-sm"))
               ),
               fluidRow(
                 box(title = "By Market (CPV Sector)", width = 12, solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("All CPV markets ranked by median relative price.",
-                                                     " Dot = median, bar = IQR (25th\u201375th percentile), dot size proportional to contract count.",
-                                                     " Colour: teal = under budget, amber = up to 20% over, red = more than 20% over.")),
+                    div(class = "description-box",
+                        p("Every CPV market is shown as one dot, ranked top-to-bottom by",
+                          strong(" % of contracts that exceeded their estimated price."),
+                          " The horizontal whiskers are ", strong("95% confidence intervals"), " on that proportion.",
+                          " The grey number to the right of each whisker is the contract count.",
+                          " The dashed vertical line is the cross-market average.",
+                          " Colour: ", strong("teal"), " = below average; ",
+                          strong("amber"), " = above average; ",
+                          strong("red"), " = 10 percentage points or more above average.",
+                          " Dot size is proportional to contract count.")),
                     uiOutput("rel_10_plot_ui"),
                     downloadButton("dl_rel_10", "Download Figure", class = "download-btn btn-sm"))
               ),
               fluidRow(
                 box(title = "By Buyer", width = 12, solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Buyers ranked by mean relative price (contract \u00f7 estimate).",
-                                                     " Stick starts at 1.0 (budget). Dot size = contract volume.",
-                                                     " Dot colour = price level (teal = near budget, red = far over).",
-                                                     " Over budget defined as rel. price > 1.0.")),
+                    div(class = "description-box",
+                        p("Buyers ranked by their ", strong("mean relative price"), " (mean of contract price ÷ estimated price across all their contracts).",
+                          " The stick starts at 1.0 (budget line); the dot marks the buyer's mean.",
+                          " A dot to the right of 1.0 means the buyer's contracts have, on average, exceeded their estimated prices.",
+                          " Dot size is proportional to contract volume.",
+                          " Colour: ", strong("teal"), " = at or under budget; ",
+                          strong("amber"), " = slightly over (up to 1.2); ",
+                          strong("red"), " = clearly over (above 1.2).",
+                          " Hover for the % over budget and total contract value.")),
                     fluidRow(
                       column(6, sliderInput("rel_buy_top_n",
                                             "Number of buyers to show:",
@@ -2416,19 +2469,52 @@ ui <- dashboardPage(
               fluidRow(box(title = "Filters", width = 12, collapsible = TRUE, status = "info",
                            filter_bar_ui("econ", "competition"))),
               div(class = "question-header", "Is there high competition?"),
+              div(class = "description-box", style = "margin: 0 15px 16px 15px;",
+                  p(strong("What is a single-bid contract?"),
+                    " A single-bid contract is one where only one supplier submitted an offer.",
+                    " With no competing offers, the buyer has no leverage on price or quality —",
+                    " the awarded price is whatever the sole bidder asked for.",
+                    " A persistently high single-bid rate signals weak market competition and",
+                    " is a recognised red flag for procurement integrity.",
+                    " International benchmarks suggest rates above 20–30% warrant investigation,",
+                    " though context matters: some sectors and procedure types are structurally",
+                    " less competitive than others.")
+              ),
               # Row 1: Trend over time + By Contract Value
               fluidRow(
                 box(title = "Single-Bid Rate Over Time", width = 6, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Share of contracts receiving only one bid, by year.",
-                          " A single bid means no competitive pressure on price.",
-                          " Red dots = years above the overall average.")),
+                        p("Each dot shows the percentage of contracts in that year that received",
+                          strong(" exactly one bid."),
+                          " The grey ribbon is the 95% confidence interval — wider ribbons mean",
+                          " fewer contracts in that year and less statistical certainty.",
+                          " The dashed line is the all-years average.",
+                          br(), br(),
+                          strong("How to read it:"),
+                          " A rising trend suggests competition is deteriorating over time.",
+                          " A spike in a single year may reflect an unusual procurement event or",
+                          " a data gap (few contracts recorded).",
+                          strong(" Red dots"), " mark years above the overall average;",
+                          strong(" teal dots"), " mark years below.",
+                          " Hover over any dot for the exact rate, contract count, and confidence bounds.")),
                     plotlyOutput("single_bid_overall_plot", height = "420px"),
                     downloadButton("dl_single_bid_overall", "Download", class = "download-btn btn-sm")),
                 box(title = "By Contract Value", width = 6, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Single-bid rate across contract value bands.",
-                          " Very low-value and very high-value contracts often attract fewer bidders.")),
+                        p("Single-bid rate broken down by the contract’s awarded value.",
+                          " Each bar covers one value band (e.g. $10K–$50K).",
+                          " The number above each bar is the count of contracts in that band.",
+                          br(), br(),
+                          strong("What to look for:"),
+                          " A U-shaped pattern — high rates at both extremes — is common.",
+                          " Very small contracts (micro-purchases) are often bought without",
+                          " advertising widely, so fewer suppliers respond.",
+                          " Very large contracts are complex and few suppliers can deliver them.",
+                          strong(" The mid-range"), " is where a healthy market should show",
+                          " the lowest single-bid rates.",
+                          " If the highest rates appear in the", strong(" mid-value bands"),
+                          " — where competition should be strongest — that is a red flag.",
+                          " Hover for exact rates and contract counts per band.")),
                     plotlyOutput("single_bid_price_plot", height = "420px"),
                     downloadButton("dl_single_bid_price", "Download", class = "download-btn btn-sm"))
               ),
@@ -2436,23 +2522,70 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "By Procedure Type", width = 6, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Single-bid rate per procedure type with 95% confidence intervals.",
-                          " Dot size reflects contract volume. Direct awards typically show higher rates by design.")),
+                        p("Single-bid rate for each procurement procedure type.",
+                          " Each dot is one procedure type; horizontal whiskers are",
+                          strong(" 95% confidence intervals"), " on the rate.",
+                          " Dot size is proportional to the number of contracts.",
+                          br(), br(),
+                          strong("What to look for:"),
+                          " Open Procedures — the most competitive and transparent route —",
+                          " should have the lowest single-bid rate.",
+                          " Negotiated and Direct Award procedures are expected to be higher",
+                          " because they often involve a pre-selected supplier.",
+                          " A concern arises when", strong(" Open Procedures"),
+                          " have a high single-bid rate comparable to Negotiated ones:",
+                          " it suggests that even nominally open tenders are not attracting",
+                          " genuine market interest.",
+                          " A very wide confidence interval means few contracts in that category",
+                          " — interpret with caution.")),
                     plotlyOutput("single_bid_procedure_plot", height = "420px"),
                     downloadButton("dl_single_bid_procedure", "Download", class = "download-btn btn-sm")),
                 box(title = "By Buyer Group", width = 6, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Single-bid rate by buyer institution type.",
-                          " Highlights which types of buyers face the least competition.")),
+                        p("Single-bid rate grouped by the type of buying institution",
+                          " (e.g. national government, local authority, public utility, health body).",
+                          " Each dot is one buyer group with 95% confidence intervals.",
+                          br(), br(),
+                          strong("What to look for:"),
+                          " Different buyer types operate in different markets and under different",
+                          " legal frameworks, so some variation is expected.",
+                          " Local governments and utilities often procure niche services with",
+                          " few local suppliers, which can legitimately push rates up.",
+                          " A buyer group that sits", strong(" well above all others"),
+                          " — especially a central government body that should have the",
+                          " most procurement capacity — is worth investigating.",
+                          " Compare this chart with the By Procedure Type chart:",
+                          " if a high-rate buyer group also over-uses negotiated procedures,",
+                          " that is a compounding risk signal.")),
                     plotlyOutput("single_bid_buyer_group_plot", height = "420px"),
                     downloadButton("dl_single_bid_buyer_group", "Download", class = "download-btn btn-sm"))
               ),
               # Row 3: CPV Sector (full width)
               fluidRow(
-                box(title = "By CPV Sector", width = 12, solidHeader = TRUE, status = "primary",
+                box(title = "By Market", width = 12, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Single-bid rate by procurement market (CPV sector).",
-                          " Some sectors are structurally less competitive than others.")),
+                        p("Single-bid rate for each CPV (Common Procurement Vocabulary) sector —",
+                          " the two-digit code that classifies what is being purchased.",
+                          " Each dot is one sector; horizontal whiskers are",
+                          strong(" 95% confidence intervals."),
+                          " The grey count to the right is the number of contracts.",
+                          " Sectors are ranked from highest to lowest single-bid rate.",
+                          " The dashed vertical line is the cross-sector average.",
+                          strong(" Teal"), " = below average;",
+                          strong(" amber"), " = above average;",
+                          strong(" red"), " = 10 percentage points or more above average.",
+                          br(), br(),
+                          strong("What to look for:"),
+                          " Sectors at the top of the chart have the weakest competition.",
+                          " Some markets are naturally thin — specialist military equipment",
+                          " or highly technical research services may have few qualified suppliers.",
+                          " More concerning are everyday goods or construction sectors",
+                          " (e.g. office supplies, road works) appearing near the top:",
+                          " these markets are competitive globally, so high single-bid rates",
+                          " there suggest local barriers, restricted advertising, or collusion.",
+                          " Sectors with very wide confidence intervals (few contracts) should",
+                          " be interpreted cautiously.",
+                          " Use the Market filter above to isolate specific sectors.")),
                     uiOutput("single_bid_market_plot_ui"),
                     downloadButton("dl_single_bid_market", "Download", class = "download-btn btn-sm"))
               ),
@@ -2460,9 +2593,26 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Top Buyers by Single-Bid Rate", width = 12, solidHeader = TRUE, status = "primary",
                     div(class = "description-box",
-                        p("Buyers with the highest share of single-bid contracts (minimum contract threshold applies).",
-                          " Label shows buyer name with total contract count in brackets.",
-                          " Dot size reflects contract volume. Colour: teal = near average, red = well above average.")),
+                        p("The buyers with the highest share of single-bid contracts,",
+                          " ranked from worst to best.",
+                          " Only buyers with at least the minimum contract count (set by the slider below)",
+                          " are included — this filters out buyers who appear to have a 100% rate",
+                          " simply because they awarded only one or two contracts ever.",
+                          " Each dot is one buyer; the label shows the buyer name and",
+                          " total contract count in brackets.",
+                          " Dot size is proportional to total contract volume.",
+                          strong(" Colour scale:"),
+                          " teal = close to the overall average; amber = moderately above; red = well above average.",
+                          br(), br(),
+                          strong("What to look for:"),
+                          " A buyer near the top with a large dot — meaning they are both",
+                          " highly active and consistently fail to attract competition —",
+                          " is the most important finding.",
+                          " Cross-reference with the By Procedure Type chart:",
+                          " if a buyer here also over-uses Direct Award or Negotiated procedures,",
+                          " the combination is a strong integrity signal.",
+                          " Use the sliders to adjust the minimum contract threshold and",
+                          " the number of buyers displayed.")),
                     fluidRow(
                       column(6, sliderInput("sb_buy_top_n",
                                             "Number of buyers to show:",
@@ -2479,27 +2629,49 @@ ui <- dashboardPage(
       # ==================================================================
       # ADMIN — CONFIGURATION
       # ==================================================================
-      tabItem(tabName = "configuration",
-              h2("Thresholds & Configuration"),
-              p(style = "color:#666; margin-bottom:20px;",
-                "Configure global settings and value thresholds.",
-                " Submission and decision period thresholds have moved to their respective tabs."),
-              
-              h3(style = "margin-top:0;", "A. Procurement Value Thresholds (local currency — bid_price column)"),
-              p(style = "color:#666;",
-                "Legal contract-value boundaries that determine which procedure type is required.",
-                " Bunching just below a threshold may indicate contract splitting.",
-                " These thresholds power the ", strong("Bunching Analysis"),
-                " chart in the Procedure Types tab."),
+      # ==================================================================
+      # ADMIN — PROCEDURE TYPES
+      # ==================================================================
+      tabItem(tabName = "procedures",
+              h2("Procedure Type Analysis"),
+              fluidRow(box(title = "Filters", width = 12, collapsible = TRUE, status = "info",
+                           filter_bar_ui("admin", "proc"))),
+              div(class = "question-header", "Is there an overuse of some procedure types?"),
               fluidRow(
-                box(title = "Value Thresholds by Supply Type",
-                    width = 12, solidHeader = TRUE, status = "primary",
+                box(title = "Procedure Type Share by Contract Value", width = 6, solidHeader = TRUE, status = "primary",
+                    div(class = "description-box",
+                        p("Share of total awarded contract value channelled through each procedure type.",
+                          " Open procedures should dominate in well-functioning systems above the relevant value threshold.",
+                          " A large share for ", strong("Negotiated without publications"), " or ",
+                          strong("Direct Awards"), " — especially for high-value contracts — may indicate",
+                          " that competitive tendering requirements are being circumvented.",
+                          " Compare with the contract count chart: a procedure type with a small count share",
+                          " but a large value share means it is used selectively for large contracts.")),
+                    plotlyOutput("procedure_share_value_plot", height = "420px"),
+                    downloadButton("dl_proc_share_value", "Download Figure", class = "download-btn btn-sm")),
+                box(title = "Procedure Type Share by Contract Count", width = 6, solidHeader = TRUE, status = "primary",
+                    div(class = "description-box",
+                        p("Share of total contract numbers awarded through each procedure type.",
+                          " This captures frequency of use, independently of contract size.",
+                          " A high share of non-competitive procedures (Direct Awards, Negotiated without publications)",
+                          " even for small-value contracts points to a systemic preference for bypassing competition.",
+                          " Use this alongside the value chart to distinguish whether overuse is concentrated",
+                          " in a few large contracts or is pervasive across many small ones.")),
+                    plotlyOutput("procedure_share_count_plot", height = "420px"),
+                    downloadButton("dl_proc_share_count", "Download Figure", class = "download-btn btn-sm"))
+              ),
+              div(class = "question-header", "Is there bunching of contract values near procedure-type thresholds?"),
+              
+              # ── Procurement Value Thresholds (moved from Configuration) ──────
+              fluidRow(
+                box(title = "Procurement Value Thresholds (local currency — bid_price column)",
+                    width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
                     p(class = "description-box",
-                      "Enter the contract value above which", strong(" Open Procedure"),
-                      " is legally required, separately for each supply type.",
-                      " Contracts kept just", em("below"), " these values to avoid the",
-                      " more demanding procedure will show up as bunching in the analysis.",
-                      " Leave blank if no threshold applies."),
+                      "Legal contract-value boundaries that determine which procedure type is required.",
+                      " Contracts kept just ", em("below"), " a threshold to avoid the more demanding procedure",
+                      " will show up as bunching in the analysis below.",
+                      " Enter the value above which ", strong("Open Procedure"), " is legally required,",
+                      " separately for each supply type. Leave blank if no threshold applies."),
                     fluidRow(
                       column(3), column(3, strong(icon("box"), " Goods")),
                       column(3, strong(icon("hard-hat"), " Works")),
@@ -2533,60 +2705,22 @@ ui <- dashboardPage(
                              numericInput("price_direct_services", NULL, value = NA),
                              numericInput("price_other_goods", NULL, value = NA),
                              numericInput("price_other_works", NULL, value = NA),
-                             numericInput("price_other_services", NULL, value = NA)
+                             numericInput("price_other_services", NULL, value = NA),
+                             # hidden inputs kept so server observers remain valid
+                             checkboxGroupInput("global_proc_filter", label = NULL,
+                                                choices = PROC_TYPE_LABELS, selected = PROC_TYPE_LABELS)
+                    ),
+                    hr(style = "margin:10px 0;"),
+                    fluidRow(
+                      column(12,
+                             actionButton("apply_thresholds", "Apply Thresholds",
+                                          icon = icon("check"), class = "btn-success"),
+                             span(style = "margin-left:15px; color:#27ae60; font-weight:bold;",
+                                  textOutput("threshold_status", inline = TRUE))
+                      )
                     )
                 )
               ),
-              
-              h3("B. Procedure Types to Include in All Outputs"),
-              p(style = "color:#555; margin-bottom:10px;",
-                "Select which procedure types to include across all plots and analyses.",
-                " Deselecting a type removes it from every chart in the app."),
-              fluidRow(
-                box(title = "Global Procedure Type Filter", width = 12, solidHeader = TRUE, status = "info",
-                    checkboxGroupInput("global_proc_filter", label = NULL,
-                                       choices = PROC_TYPE_LABELS, selected = PROC_TYPE_LABELS, inline = TRUE),
-                    fluidRow(column(6,
-                                    actionButton("select_all_procs",   "Select All",   class = "btn-xs btn-default"),
-                                    actionButton("deselect_all_procs", "Deselect All", class = "btn-xs btn-default")
-                    ))
-                )
-              ),
-              
-              fluidRow(
-                column(12,
-                       actionButton("apply_thresholds", "Apply Thresholds",
-                                    icon = icon("check"), class = "btn-success btn-lg"),
-                       span(style = "margin-left:15px; color:#27ae60; font-weight:bold;",
-                            textOutput("threshold_status", inline = TRUE))
-                )
-              ),
-              br(),
-              fluidRow(
-                box(title = "Current Active Thresholds", width = 12, status = "info",
-                    verbatimTextOutput("threshold_summary"))
-              )
-      ),
-      
-      # ==================================================================
-      # ADMIN — PROCEDURE TYPES
-      # ==================================================================
-      tabItem(tabName = "procedures",
-              h2("Procedure Type Analysis"),
-              fluidRow(box(title = "Filters", width = 12, collapsible = TRUE, status = "info",
-                           filter_bar_ui("admin", "proc"))),
-              div(class = "question-header", "Is there an overuse of some procedure types?"),
-              fluidRow(
-                box(title = "Procedure Type Share by Contract Value", width = 6, solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Share of total contract value awarded through each procedure type.")),
-                    plotlyOutput("procedure_share_value_plot", height = "420px"),
-                    downloadButton("dl_proc_share_value", "Download Figure", class = "download-btn btn-sm")),
-                box(title = "Procedure Type Share by Contract Count", width = 6, solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Share of contract numbers for each procedure type.")),
-                    plotlyOutput("procedure_share_count_plot", height = "420px"),
-                    downloadButton("dl_proc_share_count", "Download Figure", class = "download-btn btn-sm"))
-              ),
-              div(class = "question-header", "Is there bunching of contract values near procedure-type thresholds?"),
               fluidRow(
                 box(title = "Contract Value Distribution by Supply Type",
                     width = 12, solidHeader = TRUE, status = "primary",
@@ -2726,7 +2860,14 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Submission Periods by Procedure Type", width = 12,
                     solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Faceted histograms (2-day bins) per procedure type, sorted by median. Each panel shows the full distribution with Q1/Q3 (dashed), median (solid) and mean (dotted) reference lines. Only procedure types selected above are shown.")),
+                    div(class = "description-box",
+                        p("Faceted histograms with ", strong("5-day bins"), " per procedure type.",
+                          " Each panel shows the full distribution of submission periods for that procedure.",
+                          " Reference lines: ", strong("solid"), " = median; ",
+                          strong("dashed"), " = Q1 and Q3 (25th and 75th percentile); ",
+                          strong("dotted"), " = mean.",
+                          " Only the procedure types selected in the filter above are shown.",
+                          " Y-axes are free across panels — focus on distribution shape and the position of the median, not bar heights across panels.")),
                     plotlyOutput("submission_proc_plot", height = "420px"),
                     downloadButton("dl_subm_proc", "Download Figure", class = "download-btn btn-sm"))
               ),
@@ -2774,9 +2915,19 @@ ui <- dashboardPage(
                 box(title = "Short vs Normal Submission Periods — Flagged Shares", width = 12,
                     solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        p("Top chart: share of contracts flagged as short (amber), medium (orange, when enabled), or normal (blue) per procedure type, sorted by share short.",
-                          " Bottom chart: per-procedure histograms with 1–2 day bins; the dashed red line marks the short-deadline threshold and the shaded zone highlights the flagged region.",
-                          " Threshold values and medium bands are configured in the panel above.")),
+                        p(strong("Top bar chart:"), " Each bar shows the share of contracts classified as",
+                          strong(" Short"), " (red), ",
+                          strong("Medium"), " (amber, if a medium band is configured), or ",
+                          strong("Normal"), " (blue) within each procedure type,",
+                          " sorted by the short share descending.",
+                          " Procedure types with no configured threshold are excluded.",
+                          br(), br(),
+                          strong("Bottom histogram (1-day bins, zoomed to 0–60 days):"),
+                          " Per-procedure distribution of submission periods in the short range.",
+                          " Bars are colour-coded by status (Short / Medium / Normal).",
+                          " The ", strong("dashed red line"), " marks the short-deadline threshold for that procedure.",
+                          " The label in each panel title shows the threshold used and the overall short share.",
+                          " Threshold values and the optional medium band are set in the panel above.")),
                     plotlyOutput("subm_share_chart",  height = "280px"),
                     downloadButton("dl_subm_share", "Download Share Chart", class = "download-btn btn-sm"),
                     hr(),
@@ -2789,7 +2940,15 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Short Submission Periods by Buyer Group", width = 12,
                     solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Share of contracts with short submission deadlines by buyer group, grouped by procedure type. Toggle between contract count share (default), contract value share, or both panels stacked. Colors distinguish procedure types.")),
+                    div(class = "description-box",
+                        p("Share of contracts with a ", strong("short submission period"), " by buyer group,",
+                          " with one facet panel per procedure type.",
+                          " Bars are stacked: ", strong("red"), " = short deadline, ",
+                          strong("blue"), " = normal deadline.",
+                          " Each bar sums to 100%.",
+                          " Toggle between contract count share (default), contract value share, or both panels stacked.",
+                          " Buyer groups with fewer than 5 contracts in a procedure type are excluded.",
+                          " Use this chart to identify which buyer categories most frequently set very short bid windows.")),
                     fluidRow(
                       column(4,
                              radioButtons("subm_buyer_view", label = "Show metric:",
@@ -2841,7 +3000,14 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Decision Periods by Procedure Type", width = 12,
                     solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Faceted histograms (2–3 day bins) per procedure type, sorted by median. Each panel shows the distribution with Q1/Q3 (dashed), median (solid) and mean (dotted) reference lines. Only procedure types selected above are shown.")),
+                    div(class = "description-box",
+                        p("Faceted histograms with ", strong("10-day bins"), " per procedure type.",
+                          " Each panel shows the full distribution of decision periods — from bid deadline to contract award or signature.",
+                          " Reference lines: ", strong("solid"), " = median; ",
+                          strong("dashed"), " = Q1 and Q3 (25th and 75th percentile); ",
+                          strong("dotted"), " = mean.",
+                          " X-axis is capped at 730 days (2 years). Only the procedure types selected above are shown.",
+                          " Y-axes are free across panels.")),
                     plotlyOutput("decision_proc_plot", height = "420px"),
                     downloadButton("dl_dec_proc", "Download Figure", class = "download-btn btn-sm"))
               ),
@@ -2885,8 +3051,17 @@ ui <- dashboardPage(
                 box(title = "Long vs Normal Decision Periods — Flagged Shares", width = 12,
                     solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        p("Top chart: share of contracts flagged as long (amber) or normal (blue) per procedure type, sorted by share long.",
-                          " Bottom chart: per-procedure histograms with 2–3 day bins; the dashed red line marks the long-decision threshold and the shaded zone highlights the flagged region.",
+                        p(strong("Top bar chart:"), " Each bar shows the share of contracts classified as",
+                          strong(" Long"), " (red) or ",
+                          strong("Normal"), " (blue) within each procedure type,",
+                          " sorted by the long share descending.",
+                          " Procedure types with no configured threshold are excluded.",
+                          br(), br(),
+                          strong("Bottom histogram (4-day bins, zoomed to 0–300 days):"),
+                          " Per-procedure distribution of decision periods in the range around the threshold.",
+                          " Bars are colour-coded Long (red) or Normal (blue).",
+                          " The ", strong("dashed red line"), " marks the long-decision threshold for that procedure.",
+                          " The label in each panel title shows the threshold and the overall long share.",
                           " Threshold values are configured in the panel above.")),
                     plotlyOutput("dec_share_chart",    height = "280px"),
                     downloadButton("dl_dec_share", "Download Share Chart", class = "download-btn btn-sm"),
@@ -2900,7 +3075,14 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Long Decision Periods by Buyer Group", width = 12,
                     solidHeader = TRUE, status = "primary",
-                    div(class = "description-box", p("Share of contracts with long decision periods by buyer group, grouped by procedure type. Toggle between contract count share (default), contract value share, or both panels stacked. Colors distinguish procedure types.")),
+                    div(class = "description-box",
+                        p("Share of contracts with a ", strong("long decision period"), " by buyer group,",
+                          " with one facet panel per procedure type.",
+                          " Bars are stacked: ", strong("red"), " = long decision, ",
+                          strong("blue"), " = normal.",
+                          " Each bar sums to 100%.",
+                          " Toggle between contract count share (default), contract value share, or both panels stacked.",
+                          " Use this chart to identify which buyer categories are slowest to award contracts after the bid deadline.")),
                     fluidRow(
                       column(4,
                              radioButtons("dec_buyer_view", label = "Show metric:",
@@ -2997,7 +3179,16 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 box(title = "Missingness by Buyer Type", width = 12, solidHeader = TRUE, status = "warning",
-                    div(class = "description-box", "Heatmap of missing share per variable by buyer type. Hover for exact values."),
+                    div(class = "description-box",
+                        p("Heatmap showing the ", strong("share of missing values"), " for each key variable, broken down by buyer type.",
+                          " Each cell shows the proportion of records from that buyer type where the variable is absent.",
+                          " Colour scale: ", strong("white = 0% missing"), " through ",
+                          strong("dark red = 100% missing"), ".",
+                          " A column that is uniformly dark across buyer types indicates a structural data gap in that field.",
+                          " A column that is dark only for certain buyer types suggests selective non-reporting,",
+                          " which may reflect differences in reporting obligations or data entry practices.",
+                          " Hover over any cell for the exact missing share.",
+                          " Use the slider above to adjust the number of buyer types shown.")),
                     uiOutput("integ_missing_buyer_slider_ui"),
                     plotlyOutput("integ_missing_buyer_plot", height = "auto"),
                     uiOutput("integ_missing_buyer_plot_height"),
@@ -3005,7 +3196,13 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 box(title = "Missingness by Procedure Type", width = 12, solidHeader = TRUE, status = "warning",
-                    div(class = "description-box", "Same heatmap broken down by procurement procedure type. Hover for exact values."),
+                    div(class = "description-box",
+                        p("Same heatmap structure as the buyer-type breakdown above,",
+                          " but grouped by ", strong("procurement procedure type"), ".",
+                          " Dark cells for a specific procedure type (e.g. Negotiated without publications)",
+                          " suggest that contracts using that procedure are systematically less well-documented.",
+                          " This can make those procedures harder to audit and may mask irregularities.",
+                          " Hover over any cell for the exact missing share.")),
                     uiOutput("integ_missing_procedure_slider_ui"),
                     plotlyOutput("integ_missing_procedure_plot", height = "auto"),
                     uiOutput("integ_missing_procedure_plot_height"),
@@ -3014,7 +3211,15 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Trends in Missing Shares Over Time", width = 12, solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        "Year x variable heatmap. A block of red in a specific year signals a reporting regime change or data-collection failure."),
+                        p("Heatmap of missing share per variable, with years on the x-axis.",
+                          " Each cell is the proportion of records in that year where the variable is absent.",
+                          " Colour scale: white = 0% missing, dark red = 100% missing.",
+                          " A ", strong("vertical band of red"), " covering a single year across many variables",
+                          " signals a data collection failure or a change in reporting rules in that year.",
+                          " A ", strong("horizontal band"), " affecting one variable across many years",
+                          " indicates a persistently missing field.",
+                          " Use this chart to decide which years to exclude from analysis and to flag",
+                          " structural data quality issues to the data provider.")),
                     uiOutput("integ_missing_time_slider_ui"),
                     plotlyOutput("integ_missing_time_plot", height = "auto"),
                     uiOutput("integ_missing_time_height_spacer"),
@@ -3023,8 +3228,15 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Variable Pairs Missing Together", width = 12, solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        "Jaccard co-occurrence: how often do two variables ", tags$em("both"),
-                        " go missing on the same row? Pairs coloured red represent a single root cause."),
+                        p("The ", strong("Jaccard co-occurrence index"), " measures how often two variables",
+                          " are both missing on the same contract record.",
+                          " A value of 1.0 means the two variables ", em("always"), " go missing together;",
+                          " 0.0 means they never do.",
+                          " Cell pairs coloured ", strong("red"), " share a single root cause —",
+                          " for example, both may be populated only when a specific document type is filed.",
+                          " If you find a tight cluster of co-missing variables, investigate whether",
+                          " those fields come from the same reporting form or system.",
+                          " Run the Advanced Missingness Tests above for the statistical MCAR test.")),
                     uiOutput("integ_missing_cooccurrence_ui"),
                     uiOutput("integ_missing_cooccurrence_download_ui"))
               ),
@@ -3119,7 +3331,15 @@ ui <- dashboardPage(
                 box(title = "Suppliers with Unusually Diversified Market Entries",
                     width = 12, solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        p("Suppliers ranked by how consistently unusual their out-of-portfolio wins are. Hover for details.")),
+                        p("Suppliers ranked by their ", strong("mean surprise score"), " across all out-of-portfolio wins.",
+                          " The surprise score for a supplier-market combination is high when that supplier wins contracts",
+                          " in a market where very few other suppliers in the same home cluster have won,",
+                          " relative to how often suppliers typically enter that market.",
+                          " A high score does not automatically indicate wrongdoing — some suppliers are legitimately diversified.",
+                          " The score is most meaningful when combined with a ", strong("high number of atypical wins"),
+                          " (shown on the x-axis): a supplier with one unusual win is less concerning than one",
+                          " with many unusual wins across multiple unrelated markets.",
+                          " Hover over each bar for the supplier ID, home cluster, and score details.")),
                     uiOutput("integ_supplier_unusual_plot_ui"),
                     uiOutput("integ_download_supplier_unusual_ui"))
               ),
@@ -3127,7 +3347,14 @@ ui <- dashboardPage(
                 box(title = "Markets Attracting Unusual Supplier Entries",
                     width = 12, solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        p("Each bubble is a CPV market ranked by a risk index combining surprise intensity and number of unusual entrants.")),
+                        p("Each bubble is a CPV market, positioned and sized by its ", strong("unusual-entry risk index."),
+                          " The index combines two factors: the ", strong("mean surprise score"),
+                          " of all unusual entrants into that market (intensity),",
+                          " and the ", strong("count of distinct unusual entrants"), " (breadth).",
+                          " Markets that score high on both dimensions are the most concerning —",
+                          " they are attracting many suppliers from unrelated backgrounds, each with a high degree of unexpectedness.",
+                          " Hover over any bubble for the market name, entrant count, and index value.",
+                          " Use this chart to prioritise which markets to investigate in depth.")),
                     uiOutput("integ_market_unusual_plot_ui"),
                     uiOutput("integ_download_market_unusual_ui"))
               ),
@@ -3136,8 +3363,17 @@ ui <- dashboardPage(
                 box(title = "Top Buyers by Supplier Concentration Over Time",
                     width = 12, solidHeader = TRUE, status = "warning",
                     div(class = "description-box",
-                        "Each panel shows the top buyers by maximum supplier concentration in that year. ",
-                        tags$b("Red bars"), " flag buyers appearing across multiple years — persistent concentration risk."),
+                        p("Each bar shows the ", strong("maximum single-supplier spending concentration"),
+                          " for a buyer in a given year.",
+                          " Concentration is defined as the share of that buyer's total spend in the year",
+                          " that went to a single supplier (the largest recipient).",
+                          " A value of 100% means one supplier received all contracts from that buyer that year.",
+                          " Only buyers with at least ",
+                          strong("3"), " distinct suppliers in a year are included (configurable with the slider below).",
+                          " ", strong("Red bars"), " flag buyers who appear in the top list across", strong(" multiple years"),
+                          " — persistent high concentration is a stronger risk signal than a single-year spike.",
+                          " Use the sliders to adjust how many buyers to show and the minimum contract count.",
+                          " Hover for exact values and the list of years in which the buyer appears.")),
                     fluidRow(
                       column(6, uiOutput("integ_conc_n_buyers_slider_ui")),
                       column(6, uiOutput("integ_conc_min_contracts_slider_ui"))
@@ -3175,27 +3411,57 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Predicted Single-Bidding by Missing Share", width = 12, solidHeader = TRUE, status = "info",
                     div(class = "description-box",
-                        p("Estimated relationship between data missingness and single-bid tender prevalence. ",
-                          "A fractional logit model with year fixed effects regresses the buyer-year single-bidding share on cumulative missingness.")),
+                        p("The ", strong("x-axis"), " is the buyer-year level share of missing values across key procurement fields.",
+                          " The ", strong("y-axis"), " is the predicted share of single-bid tenders for that buyer in that year.",
+                          " The ", strong("fitted line"), " comes from a fractional logit model with year fixed effects,",
+                          " which controls for year-to-year variation in overall competition levels.",
+                          " If the line slopes upward, buyers who report less information also tend to run",
+                          " less competitive tenders — suggesting that data opacity and low competition go together.",
+                          " The grey band is the ", strong("95% confidence interval"), " around the prediction.",
+                          " Note: this is a correlation, not a causal estimate.",
+                          " Hover for predicted values at each point along the curve.")),
                     uiOutput("integ_singleb_plot_ui"),
                     uiOutput("integ_download_singleb_ui"))
               ),
               fluidRow(
                 box(title = "Single-Bidding Sensitivity Analysis", width = 12, solidHeader = TRUE, status = "info",
-                    div(class = "description-box", "Robustness of the single-bidding model across different specifications."),
+                    div(class = "description-box",
+                        p("Each row is one model specification — a different combination of fixed effects",
+                          " (buyer, year, or both), standard error clustering (none, by buyer, by year),",
+                          " and control variables.",
+                          " The dot is the estimated coefficient on missing share; the whiskers are 95% confidence intervals.",
+                          " A result is considered ", strong("robust"), " if the sign and approximate magnitude",
+                          " are consistent across most specifications and the confidence interval excludes zero.",
+                          " Specifications that change sign or lose significance entirely indicate sensitivity",
+                          " to modelling choices and should be flagged when reporting the headline result.")),
                     uiOutput("integ_singleb_sensitivity_table"))
               ),
               fluidRow(
                 box(title = "Predicted Relative Price by Missing Share", width = 12, solidHeader = TRUE, status = "info",
                     div(class = "description-box",
-                        p("How relative prices correlate with overall missingness after controlling for key factors. ",
-                          "A linear fixed-effects model of relative_price on total_missing_share.")),
+                        p("The ", strong("x-axis"), " is the buyer-year level share of missing values across key procurement fields.",
+                          " The ", strong("y-axis"), " is the predicted relative price (contract price ÷ estimated price)",
+                          " for contracts awarded by that buyer in that year.",
+                          " The ", strong("fitted line"), " comes from a linear fixed-effects model (OLS)",
+                          " that controls for buyer and year effects.",
+                          " A value above 1.0 on the y-axis means contracts exceed their estimated prices on average.",
+                          " If the line slopes upward, buyers with more missing data also tend to pay more",
+                          " relative to their own estimates — consistent with weaker procurement discipline.",
+                          " The grey band is the ", strong("95% confidence interval"), ".",
+                          " Note: this is a correlational estimate. Causality cannot be established from this model alone.")),
                     uiOutput("integ_relprice_plot_ui"),
                     uiOutput("integ_download_relprice_ui"))
               ),
               fluidRow(
                 box(title = "Relative Price Sensitivity Analysis", width = 12, solidHeader = TRUE, status = "info",
-                    div(class = "description-box", "Robustness of the relative price model across different specifications."),
+                    div(class = "description-box",
+                        p("Same structure as the single-bidding sensitivity panel above,",
+                          " but for the relative price model.",
+                          " Each row tests a different combination of fixed effects, clustering, and controls.",
+                          " The three model types tested are OLS in levels, OLS with log-transformed relative price,",
+                          " and a Gamma GLM with log link (more appropriate when the outcome is strictly positive).",
+                          " Consistent positive coefficients across model types indicate that the relationship",
+                          " between missing data and price overruns is not an artefact of the distributional assumption.")),
                     uiOutput("integ_relprice_sensitivity_table"))
               )
       ),
@@ -3393,17 +3659,14 @@ server <- function(input, output, session) {
     prices   = list(year=NULL, market=NULL, value=NULL, buyer_type=NULL, procedure_type=NULL)
   )
   
+  # integ_filtered_data: convenience accessor that returns the committed
+  # filtered state (updated after Apply Filters is clicked).
+  # Using integ$filtered_data directly keeps the overview value-boxes
+  # in sync with the rest of the integrity analysis, and avoids reading
+  # the now tab-specific filter input IDs from a context that has no tab.
   integ_filtered_data <- reactive({
-    req(integ$data)
-    integrity_filter_data(
-      df             = integ$data,
-      year_range     = input$integ_year_range,
-      market         = input$integ_market_filter,
-      value_range    = input$integ_value_range,
-      buyer_type     = input$integ_buyer_type_filter,
-      procedure_type = input$integ_procedure_type_filter,
-      value_divisor  = isolate(integ$value_divisor)
-    )
+    req(integ$filtered_data)
+    integ$filtered_data
   })
   
   # ============================================================
@@ -3493,11 +3756,23 @@ server <- function(input, output, session) {
       updateNumericInput(session, "thr_med_min_open", value = thr_loaded$subm_medium_open_min)
     if (!is.na(thr_loaded$subm_medium_open_max))
       updateNumericInput(session, "thr_med_max_open", value = thr_loaded$subm_medium_open_max)
+    # Decision thresholds — explicitly set the "No legal threshold" checkbox for
+    # EVERY decision procedure type so the UI always matches admin$thresholds.
+    # When long_decision_days is NA (e.g. BG) the checkbox must be TRUE so the
+    # flagged-shares plot uses statistical derivation immediately without the
+    # user having to click Apply.
+    dec_pids <- c("dec_open","dec_restricted","dec_neg_pub",
+                  "dec_neg_nopub","dec_neg_unspec","dec_competitive",
+                  "dec_innov","dec_direct","dec_other")
     if (!is.na(thr_loaded$long_decision_days)) {
-      for (pid in c("dec_open", "dec_restricted", "dec_neg_pub")) {
+      for (pid in dec_pids) {
         updateCheckboxInput(session, paste0("no_thr_", pid),   value = FALSE)
         updateNumericInput(session,  paste0("thr_days_", pid), value = thr_loaded$long_decision_days)
       }
+    } else {
+      # NA threshold — tell UI to derive statistically so plots render immediately
+      for (pid in dec_pids)
+        updateCheckboxInput(session, paste0("no_thr_", pid), value = TRUE)
     }
     # Country-specific price thresholds
     # BG (Bulgaria): EU procurement thresholds in BGN
@@ -3602,6 +3877,54 @@ server <- function(input, output, session) {
         if (!"cpv_cluster" %in% names(df_econ) && "lot_productcode" %in% names(df_econ))
           df_econ <- df_econ %>% mutate(cpv_cluster = substr(as.character(lot_productcode), 1, 2))
         
+        # Normalise cpv_cluster on econ_results$df: any 2-digit code not in CPV_DESCRIPTIONS
+        # is remapped to "99" so unknown markets collapse into one "99 - Other" bucket.
+        # IMPORTANT: this must happen BEFORE econ$analysis and econ$data are assigned so
+        # that apply_econ_filters / reset_econ_filters always read normalised codes and the
+        # market filter dropdown never shows raw un-labelled codes like "CPV 22".
+        if (!is.null(econ_results$df) && "cpv_cluster" %in% names(econ_results$df)) {
+          known_codes <- names(CPV_DESCRIPTIONS)
+          econ_results$df$cpv_cluster <- ifelse(
+            econ_results$df$cpv_cluster %in% known_codes,
+            econ_results$df$cpv_cluster,
+            "99"
+          )
+          econ_results$df$cpv_category <- get_cpv_label(econ_results$df$cpv_cluster)
+        }
+        # Apply the same normalisation to supplier_stats so the supplier dynamics
+        # picker and heatmaps use exactly the same market names as the market size plots.
+        if (!is.null(econ_results$supplier_stats) &&
+            "cpv_cluster" %in% names(econ_results$supplier_stats)) {
+          known_codes <- names(CPV_DESCRIPTIONS)
+          econ_results$supplier_stats$cpv_cluster <- ifelse(
+            econ_results$supplier_stats$cpv_cluster %in% known_codes,
+            econ_results$supplier_stats$cpv_cluster,
+            "99"
+          )
+          # Re-aggregate: if unknowns were split across multiple original codes, merge them
+          econ_results$supplier_stats <- econ_results$supplier_stats %>%
+            dplyr::group_by(cpv_cluster, tender_year) %>%
+            dplyr::summarise(
+              n_suppliers        = sum(n_suppliers,        na.rm = TRUE),
+              n_new_suppliers    = sum(n_new_suppliers,    na.rm = TRUE),
+              n_repeat_suppliers = sum(n_repeat_suppliers, na.rm = TRUE),
+              .groups = "drop"
+            ) %>%
+            dplyr::mutate(
+              share_new    = n_new_suppliers    / pmax(n_suppliers, 1),
+              share_repeat = n_repeat_suppliers / pmax(n_suppliers, 1)
+            )
+        }
+        # Normalise df_econ (econ$data) the same way so the value filter widget and
+        # any other consumer of econ$data also sees consistent CPV codes.
+        if ("cpv_cluster" %in% names(df_econ)) {
+          known_codes  <- names(CPV_DESCRIPTIONS)
+          df_econ$cpv_cluster  <- ifelse(df_econ$cpv_cluster %in% known_codes, df_econ$cpv_cluster, "99")
+          df_econ$cpv_category <- get_cpv_label(df_econ$cpv_cluster)
+        }
+
+        # Assign AFTER all normalisation is complete — R copy-on-modify means assigning
+        # earlier would give econ$analysis$df the pre-normalisation codes.
         econ$data              <- df_econ
         econ$analysis          <- econ_results
         econ$filtered_data     <- econ_results$df
@@ -3632,7 +3955,7 @@ server <- function(input, output, session) {
           df              = df_admin,
           country_code    = country_code,
           output_dir      = tempdir(),
-          run_regressions = !isTRUE(input$skip_regressions),
+          run_regressions = FALSE,  # always skipped on load; run on demand from the Regression tab
           thresholds      = NULL
         )
         
@@ -3865,80 +4188,120 @@ server <- function(input, output, session) {
   # FILTER UI GENERATION — ECON SECTION
   # ============================================================
   
+  # VALUE FILTER SYNC: coarse M slider → precise K inputs
+  # Defined here so it is available to all three section filter loops below.
+  make_slider_sync <- function(coarse_id, min_k_id, max_k_id, rate_fn) {
+    observeEvent(input[[coarse_id]], {
+      v <- input[[coarse_id]]; req(!is.null(v))
+      rate <- rate_fn()
+      updateNumericInput(session, min_k_id, value = floor(v[1] * 1e3))
+      updateNumericInput(session, max_k_id, value = ceiling(v[2] * 1e3))
+    }, ignoreInit = TRUE)
+  }
+  
   econ_tabs <- c("overview","market","supplier","network","price","competition")
   
-  # ── Shared filter widget reactives (computed once; each tab's uiOutput
-  #    container renders the same widget — all tabs share the same input IDs) ──
-  .econ_year_widget <- reactive({
+  # ── Per-tab filter widget builders — each tab gets its own unique input IDs
+  #    to avoid Shiny's "duplicate input ID" warning that occurs when the same
+  #    pickerInput/sliderInput ID is inserted into multiple uiOutput containers
+  #    that all live in the DOM simultaneously.
+  #    Naming convention: econ_yr_{tab}, econ_mkt_{tab}, econ_val_{tab},
+  #                       econ_btype_{tab}, econ_ptype_{tab}
+  # ──────────────────────────────────────────────────────────────────────────
+  .econ_year_widget <- function(t) {
     req(econ$filtered_data)
     years <- econ$filtered_data$tender_year; years <- years[!is.na(years)]
     if ("tender_year" %in% names(econ$filtered_data) && length(years) > 0)
-      sliderInput("econ_year_range", "Year Range:",
+      sliderInput(paste0("econ_yr_", t), "Year Range:",
                   min=min(years), max=max(years), value=c(min(years),max(years)), step=1, sep="")
-  })
-  .econ_market_widget <- reactive({
-    req(econ$filtered_data)
-    if (!"cpv_cluster" %in% names(econ$filtered_data)) return(NULL)
-    cpv_codes <- sort(unique(econ$filtered_data$cpv_cluster))
-    cpv_codes  <- cpv_codes[!is.na(cpv_codes) & cpv_codes != ""]
-    if (length(cpv_codes) == 0) return(NULL)
-    cpv_choices <- setNames(cpv_codes, sapply(cpv_codes, get_cpv_label))
-    pickerInput("econ_market_filter", "Market (CPV):",
-                choices=c("All"="All", cpv_choices), selected="All", multiple=TRUE,
-                options=list(`actions-box`=TRUE, `live-search`=TRUE))
-  })
-  .econ_value_widget <- reactive({
-    # Use full unfiltered data so widget range never changes when other filters applied
+  }
+  .econ_market_widget <- function(t) {
+    # Read choices from FULL unfiltered data so the widget does not re-render
+    # (and lose its selection) every time a different filter is applied.
     src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
     req(!is.null(src))
-    price_col <- if ("bid_priceusd"          %in% names(src)) "bid_priceusd"
-    else if ("bid_price"           %in% names(src)) "bid_price"
-    else if ("lot_estimatedprice"  %in% names(src)) "lot_estimatedprice" else NULL
+    if (!"cpv_cluster" %in% names(src)) return(NULL)
+    cpv_codes <- sort(unique(src$cpv_cluster))
+    cpv_codes <- cpv_codes[!is.na(cpv_codes) & cpv_codes != ""]
+    if (length(cpv_codes) == 0) return(NULL)
+    cpv_choices <- setNames(cpv_codes, sapply(cpv_codes, get_cpv_label))
+    # Restore active selection so switching tabs does not wipe the picker
+    cur_sel <- econ_filters$active$market %||% character(0)
+    pickerInput(paste0("econ_mkt_", t), "Market (CPV):",
+                choices  = cpv_choices,
+                selected = cur_sel,
+                multiple = TRUE,
+                options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                `none-selected-text` = "All markets"))
+  }
+  .econ_value_widget <- function(t) {
+    src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
+    req(!is.null(src))
+    price_col <- if ("bid_priceusd"         %in% names(src)) "bid_priceusd"
+    else if ("bid_price"          %in% names(src)) "bid_price"
+    else if ("lot_estimatedprice" %in% names(src)) "lot_estimatedprice" else NULL
     if (is.null(price_col)) return(NULL)
     prices <- src[[price_col]]; prices <- prices[!is.na(prices) & prices > 0]
     if (length(prices) == 0) return(NULL)
-    cur  <- input$econ_value_currency %||% "USD"
+    cur  <- input[[paste0("econ_val_cur_", t)]] %||% "USD"
     rate <- if (cur == "BGN") .BGN_PER_USD else 1
     div  <- 1e3
-    econ$value_divisor  <- div / rate
-    econ$value_max_k    <- ceiling(max(prices) * rate / div)
-    make_value_filter_widget(prices, "econ_value_currency", "econ_value_range", cur)
-  })
-  .econ_buyer_widget <- reactive({
-    req(econ$filtered_data)
-    if (!"buyer_buyertype" %in% names(econ$filtered_data)) return(NULL)
-    raw_types <- unique(econ$filtered_data$buyer_buyertype); raw_types <- raw_types[!is.na(raw_types)]
+    econ$value_divisor <- div / rate
+    econ$value_max_k   <- ceiling(max(prices) * rate / div)
+    make_value_filter_widget(prices, paste0("econ_val_cur_", t), paste0("econ_val_rng_", t), cur)
+  }
+  .econ_buyer_widget <- function(t) {
+    src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
+    req(!is.null(src))
+    if (!"buyer_buyertype" %in% names(src)) return(NULL)
+    raw_types <- unique(src$buyer_buyertype); raw_types <- raw_types[!is.na(raw_types)]
     if (length(raw_types) == 0) return(NULL)
     df_map <- data.frame(raw=raw_types, group=as.character(add_buyer_group(raw_types)), stringsAsFactors=FALSE)
     econ_buyer_mapping(df_map)
-    pickerInput("econ_buyer_type_filter", "Buyer Type:",
-                choices=c("All", sort(unique(df_map$group))), selected="All",
-                multiple=TRUE, options=list(`actions-box`=TRUE))
-  })
-  .econ_proc_widget <- reactive({
-    req(econ$filtered_data)
-    if (!"tender_proceduretype" %in% names(econ$filtered_data)) return(NULL)
-    raw_types <- unique(econ$filtered_data$tender_proceduretype); raw_types <- raw_types[!is.na(raw_types)]
+    cur_sel <- econ_filters$active$buyer_type %||% character(0)
+    pickerInput(paste0("econ_btype_", t), "Buyer Type:",
+                choices  = sort(unique(df_map$group)),
+                selected = cur_sel,
+                multiple = TRUE,
+                options  = list(`actions-box` = TRUE,
+                                `none-selected-text` = "All buyer types"))
+  }
+  .econ_proc_widget <- function(t) {
+    src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
+    req(!is.null(src))
+    if (!"tender_proceduretype" %in% names(src)) return(NULL)
+    raw_types <- unique(src$tender_proceduretype); raw_types <- raw_types[!is.na(raw_types)]
     if (length(raw_types) == 0) return(NULL)
     df_map <- data.frame(raw=raw_types, cleaned=recode_procedure_type(raw_types), stringsAsFactors=FALSE)
     econ_procedure_mapping(df_map)
-    pickerInput("econ_procedure_type_filter", "Procedure Type:",
-                choices=c("All", sort(unique(df_map$cleaned))), selected="All",
-                multiple=TRUE, options=list(`actions-box`=TRUE, `live-search`=TRUE))
-  })
+    cur_sel <- econ_filters$active$procedure_type %||% character(0)
+    pickerInput(paste0("econ_ptype_", t), "Procedure Type:",
+                choices  = sort(unique(df_map$cleaned)),
+                selected = cur_sel,
+                multiple = TRUE,
+                options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                `none-selected-text` = "All procedure types"))
+  }
   
   for (tab in econ_tabs) {
     local({
       t <- tab
-      output[[paste0("econ_year_filter_",           t)]] <- renderUI(.econ_year_widget())
-      output[[paste0("econ_market_filter_",         t)]] <- renderUI(.econ_market_widget())
-      output[[paste0("econ_value_filter_",          t)]] <- renderUI(.econ_value_widget())
-      output[[paste0("econ_buyer_type_filter_",     t)]] <- renderUI(.econ_buyer_widget())
-      output[[paste0("econ_procedure_type_filter_", t)]] <- renderUI(.econ_proc_widget())
+      output[[paste0("econ_year_filter_",           t)]] <- renderUI(.econ_year_widget(t))
+      output[[paste0("econ_market_filter_",         t)]] <- renderUI(.econ_market_widget(t))
+      output[[paste0("econ_value_filter_",          t)]] <- renderUI(.econ_value_widget(t))
+      output[[paste0("econ_buyer_type_filter_",     t)]] <- renderUI(.econ_buyer_widget(t))
+      output[[paste0("econ_procedure_type_filter_", t)]] <- renderUI(.econ_proc_widget(t))
       output[[paste0("econ_filter_status_",         t)]] <- renderText({
         econ$slider_trigger
         paste("  📋", get_filter_description(econ_filters$active))
       })
+      # Per-tab coarse↔fine slider sync for the value filter
+      make_slider_sync(
+        paste0("econ_val_rng_", t, "_coarse"),
+        paste0("econ_val_rng_", t, "_min_k"),
+        paste0("econ_val_rng_", t, "_max_k"),
+        local({ tt <- t; function() if ((input[[paste0("econ_val_cur_", tt)]] %||% "USD") == "BGN") .BGN_PER_USD else 1 })
+      )
     })
   }
   
@@ -3950,18 +4313,17 @@ server <- function(input, output, session) {
     req(econ$data, econ$analysis)
     tryCatch({
       current_filters <- list(
-        year           = input$econ_year_range,
-        market         = input$econ_market_filter,
+        year           = input[[paste0("econ_yr_",    tab_name)]],
+        market         = input[[paste0("econ_mkt_",   tab_name)]],
         value = {
-          mn_k <- input$econ_value_range_min_k
-          mx_k <- input$econ_value_range_max_k
-          # Blank = use data min (0) or max
+          mn_k <- input[[paste0("econ_val_rng_", tab_name, "_min_k")]]
+          mx_k <- input[[paste0("econ_val_rng_", tab_name, "_max_k")]]
           mn <- if (is.null(mn_k) || is.na(mn_k)) 0 else mn_k
           mx <- if (is.null(mx_k) || is.na(mx_k)) (econ$value_max_k %||% 1e9) else mx_k
           c(mn, mx)
         },
-        buyer_type     = input$econ_buyer_type_filter,
-        procedure_type = input$econ_procedure_type_filter
+        buyer_type     = input[[paste0("econ_btype_", tab_name)]],
+        procedure_type = input[[paste0("econ_ptype_", tab_name)]]
       )
       econ_filters$active        <- current_filters
       econ_filters[[tab_name]]   <- current_filters
@@ -3989,6 +4351,23 @@ server <- function(input, output, session) {
         econ$filtered_analysis$market_size_av <- plot_market_bubble(ms)
         if (all(c("bidder_masterid","tender_year","cpv_cluster") %in% names(filtered))) {
           ss <- compute_supplier_entry(filtered)
+          # Normalise supplier_stats cpv_cluster to match the normalised filtered data
+          if ("cpv_cluster" %in% names(ss)) {
+            known_codes <- names(CPV_DESCRIPTIONS)
+            ss$cpv_cluster <- ifelse(ss$cpv_cluster %in% known_codes, ss$cpv_cluster, "99")
+            ss <- ss %>%
+              dplyr::group_by(cpv_cluster, tender_year) %>%
+              dplyr::summarise(
+                n_suppliers        = sum(n_suppliers,        na.rm = TRUE),
+                n_new_suppliers    = sum(n_new_suppliers,    na.rm = TRUE),
+                n_repeat_suppliers = sum(n_repeat_suppliers, na.rm = TRUE),
+                .groups = "drop"
+              ) %>%
+              dplyr::mutate(
+                share_new    = n_new_suppliers    / pmax(n_suppliers, 1),
+                share_repeat = n_repeat_suppliers / pmax(n_suppliers, 1)
+              )
+          }
           econ$filtered_analysis$supplier_stats <- ss
         }
       }, error = function(e) message("Market sizing update: ", e$message))
@@ -4028,18 +4407,17 @@ server <- function(input, output, session) {
     req(admin$data)
     tryCatch({
       current_filters <- list(
-        year           = input$admin_year_range,
-        market         = input$admin_market_filter,
+        year           = input[[paste0("admin_yr_",    tab_name)]],
+        market         = input[[paste0("admin_mkt_",   tab_name)]],
         value = {
-          mn_k <- input$admin_value_range_min_k
-          mx_k <- input$admin_value_range_max_k
-          # Blank = use data min (0) or max
+          mn_k <- input[[paste0("admin_val_rng_", tab_name, "_min_k")]]
+          mx_k <- input[[paste0("admin_val_rng_", tab_name, "_max_k")]]
           mn <- if (is.null(mn_k) || is.na(mn_k)) 0 else mn_k
           mx <- if (is.null(mx_k) || is.na(mx_k)) (admin$value_max_k %||% 1e9) else mx_k
           c(mn, mx)
         },
-        buyer_type     = input$admin_buyer_type_filter,
-        procedure_type = input$admin_procedure_type_filter
+        buyer_type     = input[[paste0("admin_btype_", tab_name)]],
+        procedure_type = input[[paste0("admin_ptype_", tab_name)]]
       )
       admin_filters$active      <- current_filters
       admin_filters[[tab_name]] <- current_filters
@@ -4091,23 +4469,29 @@ server <- function(input, output, session) {
         if (!is.null(year_col)) {
           years <- admin$data[[year_col]]; years <- years[!is.na(years)]
           if (length(years) > 0)
-            sliderInput("admin_year_range", "Year Range:",
+            sliderInput(paste0("admin_yr_", t), "Year Range:",
                         min = min(years), max = max(years),
                         value = c(min(years), max(years)), step = 1, sep = "")
         }
       })
       
       output[[paste0("admin_market_filter_", t)]] <- renderUI({
-        req(econ$filtered_data)
-        if ("cpv_cluster" %in% names(econ$filtered_data)) {
-          cpv_codes <- sort(unique(econ$filtered_data$cpv_cluster))
+        # Read from full unfiltered data so the widget is not invalidated on
+        # every filter application and does not lose its current selection.
+        src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
+        req(!is.null(src))
+        if ("cpv_cluster" %in% names(src)) {
+          cpv_codes <- sort(unique(src$cpv_cluster))
           cpv_codes <- cpv_codes[!is.na(cpv_codes) & cpv_codes != ""]
           if (length(cpv_codes) > 0) {
             cpv_choices <- setNames(cpv_codes, sapply(cpv_codes, get_cpv_label))
-            pickerInput("admin_market_filter", "Market (CPV):",
-                        choices = c("All" = "All", cpv_choices),
-                        selected = "All", multiple = TRUE,
-                        options = list(`actions-box` = TRUE, `live-search` = TRUE))
+            cur_sel <- admin_filters$active$market %||% character(0)
+            pickerInput(paste0("admin_mkt_", t), "Market (CPV):",
+                        choices  = cpv_choices,
+                        selected = cur_sel,
+                        multiple = TRUE,
+                        options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                        `none-selected-text` = "All markets"))
           }
         }
       })
@@ -4119,12 +4503,12 @@ server <- function(input, output, session) {
         if (!is.null(price_col)) {
           prices <- admin$data[[price_col]]; prices <- prices[!is.na(prices) & prices > 0]
           if (length(prices) > 0) {
-            cur  <- input$admin_value_currency %||% "USD"
+            cur  <- input[[paste0("admin_val_cur_", t)]] %||% "USD"
             rate <- if (cur == "BGN") .BGN_PER_USD else 1
             div  <- 1e3
             admin$value_divisor <- div / rate
             admin$value_max_k   <- ceiling(max(prices) * rate / div)
-            make_value_filter_widget(prices, "admin_value_currency", "admin_value_range", cur)
+            make_value_filter_widget(prices, paste0("admin_val_cur_", t), paste0("admin_val_rng_", t), cur)
           }
         }
       })
@@ -4136,10 +4520,15 @@ server <- function(input, output, session) {
             mutate(buyer_group = add_buyer_group(buyer_buyertype)) %>%
             pull(buyer_group) %>% as.character() %>% unique() %>% sort()
           buyer_groups <- buyer_groups[!is.na(buyer_groups)]
-          if (length(buyer_groups) > 0)
-            pickerInput("admin_buyer_type_filter", "Buyer Type:",
-                        choices = c("All", buyer_groups), selected = "All",
-                        multiple = TRUE, options = list(`actions-box` = TRUE))
+          if (length(buyer_groups) > 0) {
+            cur_sel <- admin_filters$active$buyer_type %||% character(0)
+            pickerInput(paste0("admin_btype_", t), "Buyer Type:",
+                        choices  = buyer_groups,
+                        selected = cur_sel,
+                        multiple = TRUE,
+                        options  = list(`actions-box` = TRUE,
+                                        `none-selected-text` = "All buyer types"))
+          }
         }
       })
       
@@ -4154,9 +4543,13 @@ server <- function(input, output, session) {
                                  stringsAsFactors = FALSE)
             admin_procedure_mapping(df_map)
             types <- sort(unique(df_map$cleaned[!is.na(df_map$cleaned)]))
-            pickerInput("admin_procedure_type_filter", "Procedure Type:",
-                        choices = c("All", types), selected = "All",
-                        multiple = TRUE, options = list(`actions-box` = TRUE, `live-search` = TRUE))
+            cur_sel <- admin_filters$active$procedure_type %||% character(0)
+            pickerInput(paste0("admin_ptype_", t), "Procedure Type:",
+                        choices  = types,
+                        selected = cur_sel,
+                        multiple = TRUE,
+                        options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                        `none-selected-text` = "All procedure types"))
           }
         }
       })
@@ -4164,6 +4557,14 @@ server <- function(input, output, session) {
       output[[paste0("admin_filter_status_", t)]] <- renderText({
         paste("  \U0001f4cb", get_filter_description(admin_filters$active))
       })
+      
+      # Per-tab coarse↔fine slider sync for the value filter
+      make_slider_sync(
+        paste0("admin_val_rng_", t, "_coarse"),
+        paste0("admin_val_rng_", t, "_min_k"),
+        paste0("admin_val_rng_", t, "_max_k"),
+        local({ tt <- t; function() if ((input[[paste0("admin_val_cur_", tt)]] %||% "USD") == "BGN") .BGN_PER_USD else 1 })
+      )
     })
   }
   
@@ -4175,27 +4576,8 @@ server <- function(input, output, session) {
     })
   }
   
-  # ============================================================
-  # ============================================================
-  # VALUE FILTER SYNC: coarse M slider → precise K inputs
-  # ============================================================
-  make_slider_sync <- function(coarse_id, min_k_id, max_k_id, rate_fn) {
-    observeEvent(input[[coarse_id]], {
-      v <- input[[coarse_id]]; req(!is.null(v))
-      rate <- rate_fn()
-      updateNumericInput(session, min_k_id, value = floor(v[1] * 1e3))
-      updateNumericInput(session, max_k_id, value = ceiling(v[2] * 1e3))
-    }, ignoreInit = TRUE)
-  }
-  make_slider_sync("econ_value_range_coarse",  "econ_value_range_min_k",
-                   "econ_value_range_max_k",
-                   function() if ((input$econ_value_currency  %||% "USD") == "BGN") .BGN_PER_USD else 1)
-  make_slider_sync("admin_value_range_coarse", "admin_value_range_min_k",
-                   "admin_value_range_max_k",
-                   function() if ((input$admin_value_currency %||% "USD") == "BGN") .BGN_PER_USD else 1)
-  make_slider_sync("integ_value_range_coarse", "integ_value_range_min_k",
-                   "integ_value_range_max_k",
-                   function() if ((input$integ_value_currency %||% "USD") == "BGN") .BGN_PER_USD else 1)
+  # Per-tab slider sync is wired inside each section's filter loop above.
+  # (econ_tabs, admin_tabs, integ_tabs each call make_slider_sync per tab)
   
   # SHARED PLOTLY HELPERS
   # ============================================================
@@ -4326,22 +4708,29 @@ server <- function(input, output, session) {
     for (col in c("bid_priceusd","lot_estimatedpriceusd","tender_finalprice","lot_estimatedprice"))
       if (col %in% names(df)) { price_var <- col; break }
     if (!"tender_year" %in% names(df) || is.null(price_var)) return(NULL)
+
+    # Total contract count per year — all rows, same as the contracts_year_plot
+    n_all <- df %>%
+      group_by(tender_year) %>%
+      summarise(n_contracts = n(), .groups = "drop")
+
+    # Value sum — only rows with a valid positive price
     year_values <- df %>%
       filter(!is.na(.data[[price_var]]), .data[[price_var]] > 0) %>%
       group_by(tender_year) %>%
-      summarise(total_value=sum(.data[[price_var]], na.rm=TRUE),
-                avg_value=mean(.data[[price_var]], na.rm=TRUE),
-                n_contracts=n(), .groups="drop")
+      summarise(total_value = sum(.data[[price_var]], na.rm = TRUE), .groups = "drop") %>%
+      left_join(n_all, by = "tender_year")
+
     max_val <- max(year_values$total_value, na.rm=TRUE)
-    if (max_val > 1e9) { sdiv <- 1e9; ylbl <- "Total Value (Billions)"; sn <- "B"
-    } else if (max_val > 1e6) { sdiv <- 1e6; ylbl <- "Total Value (Millions)"; sn <- "M"
-    } else if (max_val > 1e3) { sdiv <- 1e3; ylbl <- "Total Value (Thousands)"; sn <- "K"
-    } else { sdiv <- 1; ylbl <- "Total Value"; sn <- "" }
+    if (max_val > 1e9) { sdiv <- 1e9; ylbl <- "Total Value (Billions USD)"; sn <- "B"
+    } else if (max_val > 1e6) { sdiv <- 1e6; ylbl <- "Total Value (Millions USD)"; sn <- "M"
+    } else if (max_val > 1e3) { sdiv <- 1e3; ylbl <- "Total Value (Thousands USD)"; sn <- "K"
+    } else { sdiv <- 1; ylbl <- "Total Value (USD)"; sn <- "" }
     year_values <- year_values %>% mutate(tv_disp = total_value / sdiv)
     p <- ggplot(year_values, aes(x=tender_year, y=tv_disp,
-                                 text=paste0("Year: ", tender_year, "<br>Contracts: ",
-                                             format(n_contracts, big.mark=","), "<br>Total: ",
-                                             round(tv_disp, 2), sn))) +
+                                 text=paste0("Year: ", tender_year,
+                                             "<br>Contracts: ", format(n_contracts, big.mark=","),
+                                             "<br>Total value: ", round(tv_disp, 2), sn))) +
       geom_col(fill="#00a65a") +
       labs(x="Year", y=ylbl) +
       pa_theme() + scale_y_continuous(labels=scales::comma)
@@ -4356,19 +4745,27 @@ server <- function(input, output, session) {
     if (!is.null(lkp) && is.list(lkp) && !is.null(lkp$cpv_2d)) {
       tbl <- lkp$cpv_2d
       if ("cpv_cluster" %in% names(tbl) && "cpv_category" %in% names(tbl))
-        tbl <- tbl %>% rename(`CPV Code`=cpv_cluster, `Category`=cpv_category)
-      datatable(tbl, options=list(pageLength=10, scrollY="350px"), rownames=FALSE,
-                caption="CPV 2-digit Market Definitions")
+        tbl <- tbl %>%
+          rename(`CPV Code` = cpv_cluster, `Category` = cpv_category) %>%
+          dplyr::select(`CPV Code`, `Category`)
+      datatable(tbl, options = list(pageLength = 15, scrollY = "350px"), rownames = FALSE,
+                caption = "CPV 2-digit Market Definitions")
     } else if (!is.null(econ$data) && "lot_productcode" %in% names(econ$data)) {
       tbl <- econ$data %>%
-        mutate(cpv_2dig=substr(as.character(lot_productcode),1,2)) %>%
-        filter(!is.na(cpv_2dig), nchar(cpv_2dig)==2) %>%
-        group_by(cpv_2dig) %>%
-        summarise(Category=paste0("CPV ", cpv_2dig), Contracts=n(), .groups="drop") %>%
-        rename(`CPV Code`=cpv_2dig)
-      datatable(tbl, options=list(pageLength=10, scrollY="350px"), rownames=FALSE)
+        dplyr::mutate(cpv_2dig = substr(as.character(lot_productcode), 1, 2)) %>%
+        dplyr::filter(!is.na(cpv_2dig), nchar(cpv_2dig) == 2) %>%
+        dplyr::group_by(cpv_2dig) %>%
+        dplyr::summarise(Contracts = dplyr::n(), .groups = "drop") %>%
+        dplyr::mutate(
+          Category = dplyr::coalesce(CPV_DESCRIPTIONS[cpv_2dig], paste0("CPV ", cpv_2dig))
+        ) %>%
+        dplyr::rename(`CPV Code` = cpv_2dig) %>%
+        dplyr::select(`CPV Code`, `Category`, Contracts) %>%
+        dplyr::arrange(`CPV Code`)
+      datatable(tbl, options = list(pageLength = 15, scrollY = "350px"), rownames = FALSE,
+                caption = "CPV 2-digit Market Definitions")
     } else {
-      datatable(data.frame(Message="No CPV data available"), options=list(dom="t"), rownames=FALSE)
+      datatable(data.frame(Message = "No CPV data available"), options = list(dom = "t"), rownames = FALSE)
     }
   })
   
@@ -5848,91 +6245,143 @@ suppliers", labels=scales::comma) +
                       .data[[rp_col]] > 0, .data[[rp_col]] < 10,
                       !is.na(.data[[price_col]]), .data[[price_col]] > 0) %>%
         dplyr::mutate(rp = .data[[rp_col]], val = .data[[price_col]])
-      
       req(nrow(d) >= 20)
       
-      # Use price_bin from the econ pipeline if available — same bins as Competition tab
-      if ("price_bin" %in% names(d) && dplyr::n_distinct(d$price_bin, na.rm=TRUE) > 1) {
+      # Band assignment — prefer existing price_bin, else fixed USD breaks
+      if ("price_bin" %in% names(d) && dplyr::n_distinct(d$price_bin, na.rm = TRUE) > 1) {
         d <- d %>% dplyr::filter(!is.na(price_bin))
-        d$band_lbl <- d$price_bin
+        d$band_lbl <- as.character(d$price_bin)
+        band_order <- levels(d$price_bin) %||% sort(unique(d$band_lbl))
       } else {
-        # Fallback: 8 equal-frequency quantile bands
-        breaks <- unique(quantile(d$val, probs = seq(0, 1, length.out = 9), na.rm = TRUE))
-        req(length(breaks) >= 3)
-        med_val <- median(d$val, na.rm = TRUE)
-        if      (med_val >= 1e6) { scale <- 1e6; suffix <- "M" }
-        else if (med_val >= 1e3) { scale <- 1e3; suffix <- "K" }
-        else                     { scale <- 1;   suffix <- ""  }
-        d$band     <- cut(d$val, breaks = breaks, include.lowest = TRUE, dig.lab = 10)
-        fmt_band   <- function(lbl) {
-          clean <- gsub("[^0-9,.-]", "", as.character(lbl))
-          parts <- strsplit(clean, ",")[[1]]
-          if (length(parts) < 2) return(as.character(lbl))
-          lo <- suppressWarnings(as.numeric(trimws(parts[1])))
-          hi <- suppressWarnings(as.numeric(trimws(parts[2])))
-          if (is.na(lo) || is.na(hi)) return(as.character(lbl))
-          paste0("$", formatC(lo/scale, format="fg", digits=3), suffix,
-                 "–$", formatC(hi/scale, format="fg", digits=3), suffix)
-        }
-        band_levels <- levels(d$band)
-        band_labels <- sapply(band_levels, fmt_band)
-        d$band_lbl  <- factor(band_labels[as.integer(d$band)], levels = band_labels)
+        breaks_usd <- c(0, 5e3, 1e4, 5e4, 1e5, 5e5, 1e6, Inf)
+        labels_usd <- c("< $5K", "$5K–$10K", "$10K–$50K",
+                        "$50K–$100K", "$100K–$500K", "$500K–$1M", "> $1M")
+        d$band_lbl <- labels_usd[
+          findInterval(d$val, breaks_usd, rightmost.closed = TRUE)
+        ]
+        band_order <- labels_usd
       }
-      
+      d$band_lbl <- factor(d$band_lbl, levels = intersect(band_order, unique(d$band_lbl)))
       req(!all(is.na(d$band_lbl)))
       
-      # Summary per band
+      # Per-band summary
       summ <- d %>%
         dplyr::group_by(band_lbl) %>%
         dplyr::summarise(
-          n         = dplyr::n(),
-          pct_over  = round(mean(rp > 1.001) * 100, 1),
-          med_rp    = median(rp),
-          q25       = quantile(rp, 0.25),
-          q75       = quantile(rp, 0.75),
-          p05       = quantile(rp, 0.05),
-          p95       = quantile(rp, 0.95),
-          .groups   = "drop"
+          n        = dplyr::n(),
+          pct_over = round(mean(rp > 1.001) * 100, 1),
+          med_rp   = median(rp),
+          q25      = quantile(rp, 0.25),
+          q75      = quantile(rp, 0.75),
+          p10      = quantile(rp, 0.10),
+          p90      = quantile(rp, 0.90),
+          .groups  = "drop"
         ) %>%
         dplyr::mutate(
-          col = ifelse(med_rp > 1.001, "#DC2626", "#00897B"),
-          tip = paste0("<b>", band_lbl, "</b><br>",
-                       "Contracts: <b>", scales::comma(n), "</b><br>",
-                       "Median relative price: <b>", round(med_rp, 3), "</b><br>",
-                       "Over budget: <b>", pct_over, "%</b><br>",
-                       "IQR: [", round(q25,3), " – ", round(q75,3), "]")
+          over     = med_rp > 1.001,
+          bar_col  = dplyr::case_when(
+            med_rp > 1.10  ~ "#DC2626",   # clearly over budget — red
+            med_rp > 1.001 ~ "#D97706",   # slightly over — amber
+            TRUE           ~ "#00897B"    # at or under — teal
+          ),
+          tip = paste0(
+            "<b>", band_lbl, "</b><br>",
+            "Contracts: <b>", scales::comma(n), "</b><br>",
+            "Median relative price: <b>", round(med_rp, 3), "</b><br>",
+            "% over budget: <b>", pct_over, "%</b><br>",
+            "IQR: [", round(q25, 3), " – ", round(q75, 3), "]<br>",
+            "P10–P90: [", round(p10, 3), " – ", round(p90, 3), "]"
+          )
         )
       
-      fig <- plot_ly(summ, x = ~band_lbl, hoverinfo = "text") %>%
-        add_segments(x = ~band_lbl, xend = ~band_lbl, y = ~p05, yend = ~p95,
-                     line = list(color = "#94A3B8", width = 1.5),
-                     hoverinfo = "skip", showlegend = FALSE) %>%
-        add_segments(x = ~band_lbl, xend = ~band_lbl, y = ~q25, yend = ~q75,
-                     line = list(color = ~col, width = 10),
-                     hoverinfo = "skip", showlegend = FALSE) %>%
-        add_markers(x = ~band_lbl, y = ~med_rp,
-                    marker = list(color = ~col, size = 8,
-                                  line = list(color = "white", width = 1.5)),
-                    text = ~tip, hoverinfo = "text", showlegend = FALSE) %>%
-        add_text(x = ~band_lbl, y = ~p95,
-                 text = ~paste0(pct_over, "%"),
-                 textposition = "top center",
-                 textfont = list(size = 10, color = ~col),
-                 hoverinfo = "skip", showlegend = FALSE) %>%
+      nb <- nrow(summ)
+      bar_w <- 0.55   # fractional width for the IQR box
+      
+      fig <- plot_ly(hoverinfo = "text")
+      
+      # P10–P90 thin whisker
+      fig <- fig %>%
+        add_segments(
+          data  = summ,
+          x     = ~as.integer(band_lbl),        xend = ~as.integer(band_lbl),
+          y     = ~p10,                          yend = ~p90,
+          line  = list(color = "#CBD5E1", width = 2),
+          hoverinfo = "skip", showlegend = FALSE
+        )
+      
+      # IQR filled bar (geom_col aesthetic)
+      for (i in seq_len(nb)) {
+        r <- summ[i, ]
+        fig <- fig %>%
+          add_trace(
+            type   = "scatter", mode = "none",
+            x      = c(i - bar_w/2, i - bar_w/2, i + bar_w/2, i + bar_w/2, i - bar_w/2),
+            y      = c(r$q25, r$q75, r$q75, r$q25, r$q25),
+            fill   = "toself",
+            fillcolor = r$bar_col,
+            line   = list(color = "white", width = 0.5),
+            opacity    = 0.82,
+            text       = r$tip, hoverinfo = "text",
+            showlegend = FALSE
+          )
+      }
+      
+      # Median tick line across the bar
+      fig <- fig %>%
+        add_segments(
+          data  = summ,
+          x     = ~as.integer(band_lbl) - bar_w/2,
+          xend  = ~as.integer(band_lbl) + bar_w/2,
+          y     = ~med_rp, yend = ~med_rp,
+          line  = list(color = "white", width = 2.5),
+          hoverinfo = "skip", showlegend = FALSE
+        )
+      
+      # % over-budget label above each bar
+      fig <- fig %>%
+        add_annotations(
+          data       = summ,
+          x          = ~as.integer(band_lbl),
+          y          = ~p90,
+          text       = ~paste0(pct_over, "%"),
+          showarrow  = FALSE,
+          yanchor    = "bottom",
+          font       = list(size = 10, color = ~bar_col),
+          yshift     = 4
+        )
+      
+      # Budget line at 1.0
+      fig <- fig %>%
         plotly::layout(
-          xaxis  = list(title = "Contract value (USD)",
-                        tickangle = -35, tickfont = list(size = 10)),
-          yaxis  = list(title = "Relative price (contract ÷ estimate)",
-                        zeroline = FALSE, tickfont = list(size = 11)),
-          shapes = list(list(type = "line", x0 = 0, x1 = 1, xref = "paper",
-                             y0 = 1, y1 = 1,
-                             line = list(color = "#888", width = 1.5, dash = "dash"))),
+          shapes = list(list(
+            type  = "line", x0 = 0.4, x1 = nb + 0.6, xref = "x",
+            y0    = 1, y1 = 1,
+            line  = list(color = "#64748B", width = 1.5, dash = "dash")
+          )),
+          xaxis = list(
+            title       = "Contract value band",
+            tickvals    = seq_len(nb),
+            ticktext    = as.character(summ$band_lbl),
+            tickangle   = -30,
+            tickfont    = list(size = 11),
+            zeroline    = FALSE,
+            showgrid    = FALSE,
+            range       = c(0.4, nb + 0.6)
+          ),
+          yaxis = list(
+            title    = "Relative price  (contract ÷ estimate)",
+            tickfont = list(size = 11),
+            zeroline = FALSE,
+            gridcolor = "#F1F5F9"
+          ),
           hoverlabel    = list(bgcolor = "white", font = list(size = 11)),
           hovermode     = "closest",
-          margin        = list(l = 60, r = 20, t = 40, b = 100),
-          paper_bgcolor = "#ffffff", plot_bgcolor  = "#ffffff"
+          margin        = list(l = 65, r = 20, t = 30, b = 90),
+          paper_bgcolor = "#ffffff",
+          plot_bgcolor  = "#ffffff"
         ) %>%
         pa_config()
+      
       econ$fig_rel_size <- fig
       fig
     }, error = function(e) .empty_plotly(paste("Not available:", e$message)))
@@ -6916,16 +7365,21 @@ suppliers", labels=scales::comma) +
   # Decision long cutoffs — shared between decision_long_plot and buyer_long_plot
   admin_dec_cutoffs <- reactive({
     req(admin$thresholds)
-    tp  <- admin_subm_open_data() %>%
+    # Use decision data (tender_days_dec) NOT submission data — the statistical
+    # fallback must be derived from decision-period durations, not submission ones.
+    tp  <- admin_decision_data() %>%
+      dplyr::mutate(tender_proceduretype = recode_procedure_type(tender_proceduretype)) %>%
+      tidyr::drop_na(tender_proceduretype) %>%
       dplyr::filter(tender_proceduretype %in% admin$global_proc_filter)
     thr <- admin$thresholds
     purrr::map_dfr(sort(unique(tp$tender_proceduretype)), function(proc) {
       key       <- as.character(proc_to_key(proc)[1])
-      d         <- tp %>% dplyr::filter(tender_proceduretype==proc) %>% dplyr::pull(tender_days_open)
+      d         <- tp %>% dplyr::filter(tender_proceduretype == proc) %>%
+                     dplyr::pull(tender_days_dec)
       thr_entry <- thr$dec[[key]]
       lc <- if (!is.null(thr_entry) && !is.na(thr_entry$days)) thr_entry$days
       else compute_outlier_cutoff(d, thr_entry$outlier_method %||% "iqr")
-      data.frame(tender_proceduretype=proc, long_cut=lc, stringsAsFactors=FALSE)
+      data.frame(tender_proceduretype = proc, long_cut = lc, stringsAsFactors = FALSE)
     })
   })
   
@@ -7582,22 +8036,24 @@ suppliers", labels=scales::comma) +
           if (!is.null(year_col)) {
             years <- sort(unique(integ$data[[year_col]])); years <- years[!is.na(years)]
             if (length(years) > 0)
-              sliderInput("integ_year_range", "Year Range:",
+              sliderInput(paste0("integ_yr_", t), "Year Range:",
                           min=min(years), max=max(years), value=c(min(years),max(years)), step=1, sep="")
           }
         })
         
         output[[paste0(p, "market_filter_", t)]] <- renderUI({
-          req(econ$filtered_data)
-          if ("cpv_cluster" %in% names(econ$filtered_data)) {
-            cpv_codes <- sort(unique(econ$filtered_data$cpv_cluster))
+          src <- if (!is.null(econ$data)) econ$data else econ$filtered_data
+          req(!is.null(src))
+          if ("cpv_cluster" %in% names(src)) {
+            cpv_codes <- sort(unique(src$cpv_cluster))
             cpv_codes <- cpv_codes[!is.na(cpv_codes) & cpv_codes != ""]
             if (length(cpv_codes) > 0) {
               cpv_choices <- setNames(cpv_codes, sapply(cpv_codes, get_cpv_label))
-              pickerInput("integ_market_filter", "Market (CPV):",
-                          choices = c("All" = "All", cpv_choices), selected = "All",
+              pickerInput(paste0("integ_mkt_", t), "Market (CPV):",
+                          choices  = cpv_choices, selected = character(0),
                           multiple = TRUE,
-                          options = list(`actions-box` = TRUE, `live-search` = TRUE))
+                          options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                          `none-selected-text` = "All markets"))
             }
           }
         })
@@ -7608,13 +8064,12 @@ suppliers", labels=scales::comma) +
           if (!is.na(price_col) && !is.null(price_col)) {
             prices <- integ$data[[price_col]]; prices <- prices[!is.na(prices) & prices > 0]
             if (length(prices) > 0) {
-              cur  <- input$integ_value_currency %||% "USD"
+              cur  <- input[[paste0("integ_val_cur_", t)]] %||% "USD"
               rate <- if (cur == "BGN") .BGN_PER_USD else 1
-              max_val_raw <- quantile(prices * rate, 0.99, na.rm = TRUE)
-              div <- 1e3
+              div  <- 1e3
               integ$value_divisor <- div / rate
               integ$value_max_k   <- ceiling(max(prices) * rate / div)
-              make_value_filter_widget(prices, "integ_value_currency", "integ_value_range", cur)
+              make_value_filter_widget(prices, paste0("integ_val_cur_", t), paste0("integ_val_rng_", t), cur)
             }
           }
         })
@@ -7626,9 +8081,11 @@ suppliers", labels=scales::comma) +
               pull(bg) %>% as.character() %>% unique() %>% sort()
             bg <- bg[!is.na(bg)]
             if (length(bg) > 0)
-              pickerInput("integ_buyer_type_filter", "Buyer Type:",
-                          choices=c("All", bg), selected="All", multiple=TRUE,
-                          options=list(`actions-box`=TRUE))
+              pickerInput(paste0("integ_btype_", t), "Buyer Type:",
+                          choices  = bg, selected = character(0),
+                          multiple = TRUE,
+                          options  = list(`actions-box` = TRUE,
+                                          `none-selected-text` = "All buyer types"))
           }
         })
         
@@ -7642,10 +8099,11 @@ suppliers", labels=scales::comma) +
                                    cleaned = recode_procedure_type(raw_types),
                                    stringsAsFactors = FALSE)
               types <- sort(unique(df_map$cleaned[!is.na(df_map$cleaned)]))
-              pickerInput("integ_procedure_type_filter", "Procedure Type:",
-                          choices  = c("All", types), selected = "All",
+              pickerInput(paste0("integ_ptype_", t), "Procedure Type:",
+                          choices  = types, selected = character(0),
                           multiple = TRUE,
-                          options  = list(`actions-box` = TRUE, `live-search` = TRUE))
+                          options  = list(`actions-box` = TRUE, `live-search` = TRUE,
+                                          `none-selected-text` = "All procedure types"))
             }
           }
         })
@@ -7653,6 +8111,14 @@ suppliers", labels=scales::comma) +
         output[[paste0(p, "filter_status_", t)]] <- renderText({
           paste(" ", get_filter_description(integ_filters[[t]]))
         })
+        
+        # Per-tab coarse↔fine slider sync for the value filter
+        make_slider_sync(
+          paste0("integ_val_rng_", t, "_coarse"),
+          paste0("integ_val_rng_", t, "_min_k"),
+          paste0("integ_val_rng_", t, "_max_k"),
+          local({ tt <- t; function() if ((input[[paste0("integ_val_cur_", tt)]] %||% "USD") == "BGN") .BGN_PER_USD else 1 })
+        )
       })
     }
   }
@@ -7663,18 +8129,17 @@ suppliers", labels=scales::comma) +
   apply_integ_filters <- function(tab_name) {
     req(integ$data)
     current_filters <- list(
-      year           = input$integ_year_range,
-      market         = input$integ_market_filter,
+      year           = input[[paste0("integ_yr_",    tab_name)]],
+      market         = input[[paste0("integ_mkt_",   tab_name)]],
       value = {
-        mn_k <- input$integ_value_range_min_k
-        mx_k <- input$integ_value_range_max_k
-        # Blank = use data min (0) or max
+        mn_k <- input[[paste0("integ_val_rng_", tab_name, "_min_k")]]
+        mx_k <- input[[paste0("integ_val_rng_", tab_name, "_max_k")]]
         mn <- if (is.null(mn_k) || is.na(mn_k)) 0 else mn_k
         mx <- if (is.null(mx_k) || is.na(mx_k)) (integ$value_max_k %||% 1e9) else mx_k
         c(mn, mx)
       },
-      buyer_type     = input$integ_buyer_type_filter,
-      procedure_type = input$integ_procedure_type_filter
+      buyer_type     = input[[paste0("integ_btype_", tab_name)]],
+      procedure_type = input[[paste0("integ_ptype_", tab_name)]]
     )
     integ_filters$active      <- current_filters
     integ_filters[[tab_name]] <- current_filters
